@@ -1,0 +1,101 @@
+.hotel-card {
+    padding: 20px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.hotel-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.hotel-main-info h3 {
+    margin: 0;
+    color: #0f172a;
+}
+
+.hotel-address {
+    margin: 4px 0 0;
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+.hotel-stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+}
+
+.avg-rating {
+    color: #f59e0b;
+}
+
+.price-per-night {
+    color: #10b981;
+}
+
+.hotel-amenities-list {
+    margin-top: 8px;
+}
+
+.amenities-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.amenity-chip {
+    background: #f1f5f9;
+    color: #475569;
+    padding: 4px 10px;
+    border-radius: 16px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.hotel-actions {
+    margin-top: auto;
+    display: flex;
+    gap: 10px;
+    padding-top: 15px;
+}
+
+.hotel-actions button {
+    flex: 1;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    background: white;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.view-details-btn:hover {
+    background: #f8fafc;
+    border-color: #94a3b8;
+}
+
+.toggle-save-btn.is-saved {
+    background: #f1f5f9;
+    color: #64748b;
+    border-color: #e2e8f0;
+}
+
+.toggle-save-btn:not(.is-saved) {
+    background: #0f172a;
+    color: white;
+    border-color: #0f172a;
+}
+
+.toggle-save-btn:not(.is-saved):hover {
+    background: #1e293b;
+}

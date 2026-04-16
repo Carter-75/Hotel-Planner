@@ -61,7 +61,18 @@ try {
   console.error('FATAL: Failed to load aiRouter:', err);
 }
 
+const session = require('express-session');
+const passport = require('passport');
+
+// Passport configuration
+require('./config/passport')(passport);
+
 const indexRouter = require('./routes/index');
+const authRouter = require('./routes/auth');
+const hotelRouter = require('./routes/hotels');
+const reviewRouter = require('./routes/reviews');
+const userActionsRouter = require('./routes/user-actions');
+const adminRouter = require('./routes/admin');
 
 const PROJECT_NAME = process.env.PROJECT_NAME || 'Portfolio Project';
 
@@ -79,23 +90,39 @@ const mongoURI = process.env.MONGODB_URI;
 }
 
 // --- Middlewares ---
-app.use(cors());
+app.use(cors({
+  origin: true,
+  credentials: true
+}));
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+// Sessions
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'secret',
+    resave: false,
+    saveUninitialized: false
+  })
+);
+
+// Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
 
 // --- Portfolio Iframe Security ---
 const isProd = process.env.PRODUCTION === 'true';
 const prodUrl = process.env.PROD_FRONTEND_URL;
 
 const frameAncestors = ["'self'", "https://carter-portfolio.fyi", "https://carter-portfolio.vercel.app", "https://*.vercel.app", `http://localhost:${process.env.PORT || '{be_port}'}`];
-if (prodUrl) {{
+if (prodUrl) {
   frameAncestors.push(prodUrl);
-}}
-if (process.env.PROD_BACKEND_URL) {{
+}
+if (process.env.PROD_BACKEND_URL) {
   frameAncestors.push(process.env.PROD_BACKEND_URL);
-}}
+}
 
 app.use(helmet({
   contentSecurityPolicy: {
@@ -116,6 +143,11 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api', indexRouter);
+app.use('/api/auth', authRouter);
+app.use('/api/hotels', hotelRouter);
+app.use('/api/reviews', reviewRouter);
+app.use('/api/user', userActionsRouter);
+app.use('/api/admin', adminRouter);
 if (aiRouter) {
   app.use('/api/ai', aiRouter);
 }

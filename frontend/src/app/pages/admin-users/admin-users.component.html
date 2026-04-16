@@ -1,0 +1,59 @@
+<section id="admin-users">
+    <header class="admin-header">
+        <form id="admin-filter-bar" (submit)="$event.preventDefault()">
+            <div class="filter-group">
+                <label for="user-filter">Filter By:</label>
+                <input type="text" id="user-filter" name="username" [(ngModel)]="usernameFilter" placeholder="Email/Name/Stars...">
+                
+                <select id="stars-select" name="stars" [(ngModel)]="ratingFilter">
+                    <option [ngValue]="null">Stars</option>
+                    <option [ngValue]="1">1 Star</option>
+                    <option [ngValue]="2">2 Stars</option>
+                    <option [ngValue]="3">3 Stars</option>
+                    <option [ngValue]="4">4 Stars</option>
+                    <option [ngValue]="5">5 Stars</option>
+                </select>
+
+                <button type="submit" class="go-btn">Go</button>
+            </div>
+
+            <button type="button" class="sort-toggle" (click)="toggleSort()">
+                {{ sortDirection() === 'asc' ? 'A-Z' : 'Z-A' }}
+            </button>
+        </form>
+    </header>
+
+    <div id="users-feed" class="moderation-list">
+        @for (item of filteredItems(); track item._id) {
+            <article class="user-mod-card card">
+                <div class="user-info-section">
+                    <h3 class="full-name">{{ item.userId?.firstName }} {{ item.userId?.lastName }}</h3>
+                    <code class="user-email">{{ item.userId?.email }}</code>
+                    
+                    <div class="review-context">
+                        <span class="review-rating">{{ item.rating }} Star</span>
+                        <p class="review-text">"{{ item.comment }}"</p>
+                    </div>
+                </div>
+
+                <div class="action-grid">
+                    <button type="button" class="action-btn ban-btn" [class.active-ban]="item.userId?.isBanned" (click)="toggleBan(item.userId?._id)">
+                        {{ item.userId?.isBanned ? 'Unban' : 'Ban' }}
+                    </button>
+                    <button type="button" class="action-btn role-btn" (click)="toggleRole(item.userId?._id)">
+                        {{ item.userId?.role === 'admin' ? 'Demote' : 'Promote' }}
+                    </button>
+                    <button type="button" class="action-btn delete-btn" (click)="deleteUser(item.userId?._id)">
+                        Delete
+                    </button>
+                </div>
+            </article>
+        } @empty {
+            <p class="empty-msg">No entries found matching your filters.</p>
+        }
+    </div>
+
+    <footer class="admin-footer">
+        <button type="button" class="secondary-btn" routerLink="/home">Back</button>
+    </footer>
+</section>

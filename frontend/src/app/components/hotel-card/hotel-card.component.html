@@ -1,0 +1,27 @@
+<article class="hotel-card card" (click)="goToDetails()">
+    <div class="hotel-main-info">
+        <h3>{{ hotel.name }}</h3>
+        <p class="hotel-address">{{ hotel.address }}</p>
+    </div>
+
+    <div class="hotel-stats">
+        <span class="avg-rating"><strong>Average Rating:</strong> {{ hotel.stars }} Stars</span>
+        <span class="price-per-night"><strong>Price:</strong> ${{ hotel.price }} / night</span>
+    </div>
+
+    <div class="hotel-amenities-list">
+        <strong>Amenities:</strong>
+        <div class="amenities-chips">
+            @for (item of hotel.amenities; track item) {
+                <span class="amenity-chip">{{ item }}</span>
+            }
+        </div>
+    </div>
+
+    <div class="hotel-actions">
+        <button type="button" class="view-details-btn">View Details</button>
+        <button type="button" class="toggle-save-btn" [class.is-saved]="isSaved()" (click)="toggleSave($event)">
+            {{ isSaved() ? 'Unsave' : 'Save' }}
+        </button>
+    </div>
+</article>

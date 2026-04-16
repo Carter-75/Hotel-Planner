@@ -1,17 +1,18 @@
 import { Routes } from '@angular/router';
-import { LoginComponent } from './components/login/login.component';
-import { SignupComponent } from './components/login/signup.component';
-import { ForgotPasswordComponent } from './components/login/forgot-password.component';
-import { ResetPasswordComponent } from './components/login/reset-password.component';
-import { ResetMessageComponent } from './components/login/reset-message.component';
-import { HomeComponent } from './components/home/home.component';
-import { SavedHotelsComponent } from './components/saved-hotels/saved-hotels.component';
-import { SearchComponent } from './components/search/search.component';
-import { AdminUsersComponent } from './components/admin-users/admin-users.component';
-import { HotelAdminComponent } from './components/hotel-admin/hotel-admin.component';
-import { ReviewsComponent } from './components/reviews/reviews.component';
-import { AddReviewComponent } from './components/reviews/add-review.component';
-import { BannedComponent } from './components/banned/banned.component';
+import { LoginComponent } from './pages/login/login.component';
+import { SignupComponent } from './pages/login/signup.component';
+import { ForgotPasswordComponent } from './pages/login/forgot-password.component';
+import { ResetPasswordComponent } from './pages/login/reset-password.component';
+import { ResetMessageComponent } from './pages/login/reset-message.component';
+import { HomeComponent } from './pages/home/home.component';
+import { SavedHotelsComponent } from './pages/saved-hotels/saved-hotels.component';
+import { AdminUsersComponent } from './pages/admin-users/admin-users.component';
+import { HotelAdminComponent } from './pages/hotel-admin/hotel-admin.component';
+import { ReviewsComponent } from './pages/reviews/reviews.component';
+import { AddReviewComponent } from './pages/reviews/add-review.component';
+import { BannedComponent } from './pages/banned/banned.component';
+import { HotelDetailsComponent } from './pages/hotel-details/hotel-details.component';
+import { adminGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -21,9 +22,9 @@ export const routes: Routes = [
   { path: 'reset-message', component: ResetMessageComponent },
   { path: 'home', component: HomeComponent },
   { path: 'saved', component: SavedHotelsComponent },
-  { path: 'search', component: SearchComponent },
-  { path: 'admin/users', component: AdminUsersComponent },
-  { path: 'admin/hotels', component: HotelAdminComponent },
+  { path: 'hotel/:id', component: HotelDetailsComponent },
+  { path: 'admin/users', component: AdminUsersComponent, canActivate: [adminGuard] },
+  { path: 'admin/hotels', component: HotelAdminComponent, canActivate: [adminGuard] },
   { path: 'reviews', component: ReviewsComponent },
   { path: 'add-review', component: AddReviewComponent },
   { path: 'banned', component: BannedComponent },

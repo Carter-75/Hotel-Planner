@@ -1,0 +1,162 @@
+#hotel-details-container {
+    padding: 40px 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.details-header {
+    margin-bottom: 30px;
+}
+
+.back-link-btn {
+    background: none;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0;
+    margin-bottom: 10px;
+}
+
+.back-link-btn:hover {
+    color: #0f172a;
+    text-decoration: underline;
+}
+
+.details-header h1 {
+    margin: 0;
+    font-size: 2.5rem;
+}
+
+.full-address {
+    color: #64748b;
+    font-size: 1.1rem;
+    margin-top: 4px;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 30px;
+    align-items: start;
+}
+
+@media (max-width: 768px) {
+    .details-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.info-section h2, .amenities-section h2 {
+    font-size: 1.25rem;
+    margin-top: 0;
+    margin-bottom: 16px;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 8px;
+}
+
+.amenities-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+}
+
+.amenity-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    color: #475569;
+}
+
+.dot {
+    width: 6px;
+    height: 6px;
+    background: #cbd5e1;
+    border-radius: 50%;
+}
+
+.details-sidebar {
+    position: sticky;
+    top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stat-row .label {
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+.stat-row .value {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.details-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.details-actions button {
+    width: 101%;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.primary-btn {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    color: #0f172a;
+}
+
+.primary-btn:hover {
+    background: #f1f5f9;
+}
+
+.secondary-btn {
+    background: white;
+    border: 1px solid #0f172a;
+    color: #0f172a;
+}
+
+.secondary-btn.is-saved {
+    background: #f1f5f9;
+    border-color: #e2e8f0;
+    color: #64748b;
+}
+
+.book-btn {
+    background: #0f172a;
+    border: 1px solid #0f172a;
+    color: white;
+    margin-top: 8px;
+}
+
+.book-btn:hover {
+    background: #1e293b;
+}
+
+.error-msg {
+    text-align: center;
+    padding: 60px;
+}

@@ -1,0 +1,9 @@
+@if (hotels.length > 0 || isLoading) {
+  <div class="search-results-view">
+    <h2>Search Results</h2>
+    <app-hotel-list 
+        [hotels]="hotels" 
+        [emptyMessage]="isLoading ? 'Finding the best hotels for you...' : 'No hotels found for your search. Try different filters!'">
+    </app-hotel-list>
+  </div>
+}

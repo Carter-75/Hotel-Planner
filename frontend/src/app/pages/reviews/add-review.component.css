@@ -1,0 +1,102 @@
+#add-review {
+    padding: 40px 20px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.add-review-header {
+    margin-bottom: 30px;
+}
+
+.back-link-btn {
+    background: none;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0;
+    margin-bottom: 10px;
+}
+
+.back-link-btn:hover {
+    color: #0f172a;
+    text-decoration: underline;
+}
+
+.add-review-header h2 {
+    margin: 0;
+    font-size: 1.75rem;
+}
+
+#add-review-form {
+    background: white;
+    padding: 30px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: #475569;
+}
+
+#rating {
+    padding: 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 1rem;
+    background: white;
+}
+
+#comment {
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 1rem;
+    resize: vertical;
+}
+
+.form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.form-actions button {
+    flex: 1;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.secondary-btn {
+    background: white;
+    border: 1px solid #cbd5e1;
+    color: #475569;
+}
+
+.secondary-btn:hover {
+    background: #f8fafc;
+}
+
+.book-btn {
+    background: #0f172a;
+    border: 1px solid #0f172a;
+    color: white;
+}
+
+.book-btn:hover {
+    background: #1e293b;
+}

@@ -1,0 +1,21 @@
+<header>
+    <div id="user-info">
+        @if (authService.isAuthenticated()) {
+            <span id="user-greeting">Hello {{ authService.currentUser()?.firstName }}</span>
+            <nav id="main-nav">
+                <button type="button" id="nav-home" routerLink="/home">Home</button>
+                <button type="button" id="nav-saved" routerLink="/saved">Saves</button>
+                
+                @if (authService.isAdmin()) {
+                    <button type="button" id="nav-users" routerLink="/admin/users">Users</button>
+                    <button type="button" id="nav-hotels" routerLink="/admin/hotels">Motels / Hotels</button>
+                }
+            </nav>
+            <button type="button" id="user-email-btn" (click)="authService.logout()" title="Logout">
+                {{ authService.currentUser()?.email }}
+            </button>
+        } @else {
+            <a routerLink="/login" id="login-nav-btn">Login / Sign up</a>
+        }
+    </div>
+</header>
