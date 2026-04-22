@@ -29,9 +29,31 @@ const passport = require('passport');
 
 const app = express();
 
-// --- Models & Routers (Must be before diagnostic routes) ---
+// --- Configuration ---
+const isProd = process.env.PRODUCTION === 'true';
+const prodUrl = process.env.PROD_FRONTEND_URL;
+const PROJECT_NAME = process.env.PROJECT_NAME || 'Portfolio Project';
+
+// Trust proxy for secure cookies on Vercel
+if (isProd) {
+  app.set('trust proxy', 1);
+}
+
+// Frame Ancestors for Iframe Security
+const frameAncestors = [
+  "'self'",
+  "https://carter-portfolio.fyi",
+  "https://carter-portfolio.vercel.app",
+  "https://*.vercel.app",
+  `http://localhost:${process.env.PORT || '3000'}`
+];
+if (prodUrl) frameAncestors.push(prodUrl);
+if (process.env.PROD_BACKEND_URL) frameAncestors.push(process.env.PROD_BACKEND_URL);
+
+// --- Models & Passport Config ---
 require('./config/passport')(passport);
 
+// --- Routers ---
 const indexRouter = require('./routes/index');
 const authRouter = require('./routes/auth');
 const hotelRouter = require('./routes/hotels');
@@ -39,12 +61,7 @@ const reviewRouter = require('./routes/reviews');
 const userActionsRouter = require('./routes/user-actions');
 const adminRouter = require('./routes/admin');
 
-// --- Models & Routers Initialization ---
-require('./config/passport')(passport);
-
-
-
-// --- Diagnostic Routes (Moved up for early availability) ---
+// --- Diagnostic Routes ---
 app.get('/api/health', async (req, res) => {
   const isConnected = mongoose.connection.readyState === 1;
   try {
@@ -65,59 +82,41 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
-app.get('/api/debug-bundle', async (req, res) => {
-  const fs = require('fs').promises;
-  async function listFiles(dir) {
-    let results = [];
-    const list = await fs.readdir(dir, { withFileTypes: true });
-    for (const file of list) {
-      const res = path.resolve(dir, file.name);
-      if (file.isDirectory()) {
-        results.push({ name: file.name, type: 'dir', children: await listFiles(res) });
-      } else {
-        results.push({ name: file.name, type: 'file' });
-      }
-    }
-    return results;
-  }
-  try {
-    const root = await listFiles(process.cwd());
-    res.json({ root });
-  } catch (err) {
-    res.status(500).json({ error: err.message, stack: err.stack });
-  }
-});
-
-
-
-
-// Session and Passport will be configured in the Middleware section below
-
-
-
-const PROJECT_NAME = process.env.PROJECT_NAME || 'Portfolio Project';
-
 // --- MongoDB Setup ---
 const mongoURI = process.env.MONGODB_URI;
 if (mongoURI) {
   console.log('INFO: Attempting to connect to MongoDB...');
   mongoose.connect(mongoURI, {
-    serverSelectionTimeoutMS: 5000 // Stop trying after 5 seconds
+    serverSelectionTimeoutMS: 5000
   })
     .then(() => console.log('OK: Connected to MongoDB'))
     .catch(err => {
       console.error('ERROR: MongoDB Connection Failed:', err.message);
-      console.log('INFO: The application will return 500/503 errors for database-dependent routes.');
     });
 } else {
-  console.warn('WARN: No MONGODB_URI found! Database features are completely disabled.');
+  console.warn('WARN: No MONGODB_URI found!');
 }
 
 // --- Middlewares ---
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+      "frame-ancestors": frameAncestors,
+    },
+  },
+}));
+
+app.use((req, res, next) => {
+  res.setHeader('X-Frame-Options', 'ALLOWALL');
+  next();
+});
+
 app.use(cors({
   origin: true,
   credentials: true
 }));
+
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -136,36 +135,11 @@ app.use(
   })
 );
 
-// Passport middleware
+// Passport
 app.use(passport.initialize());
 app.use(passport.session());
 
-// --- Portfolio Iframe Security ---
-const isProd = process.env.PRODUCTION === 'true';
-const prodUrl = process.env.PROD_FRONTEND_URL;
-
-const frameAncestors = ["'self'", "https://carter-portfolio.fyi", "https://carter-portfolio.vercel.app", "https://*.vercel.app", `http://localhost:${process.env.PORT || '{be_port}'}`];
-if (prodUrl) {
-  frameAncestors.push(prodUrl);
-}
-if (process.env.PROD_BACKEND_URL) {
-  frameAncestors.push(process.env.PROD_BACKEND_URL);
-}
-
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-      "frame-ancestors": frameAncestors,
-    },
-  },
-}));
-
-app.use((req, res, next) => {
-  res.setHeader('X-Frame-Options', 'ALLOWALL'); // For compatibility
-  next();
-});
-
+// --- Routes ---
 app.get('/', (req, res) => {
   res.send(`API for ${PROJECT_NAME} is running at /api`);
 });
@@ -176,6 +150,7 @@ app.use('/api/hotels', hotelRouter);
 app.use('/api/reviews', reviewRouter);
 app.use('/api/user', userActionsRouter);
 app.use('/api/admin', adminRouter);
+
 
 
 
