@@ -32,7 +32,7 @@ function normalizeOutput() {
     console.log(`[build-tasks] Normalizing output: moving ${src} to ${dest}`);
     fs.cpSync(src, dest, { recursive: true });
     fs.rmSync(src, { recursive: true });
-    console.log(`[build-tasks] Output normalization complete.`);
+    console.log('[build-tasks] Output normalization complete.');
   } else {
     console.log(`[build-tasks] Skipping normalization: ${src} not found.`);
   }

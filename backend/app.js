@@ -45,7 +45,7 @@ const frameAncestors = [
   "https://carter-portfolio.fyi",
   "https://carter-portfolio.vercel.app",
   "https://*.vercel.app",
-  `http://localhost:${process.env.PORT || '3000'}`
+  'http://localhost:' + (process.env.PORT || '3000')
 ];
 if (prodUrl) frameAncestors.push(prodUrl);
 if (process.env.PROD_BACKEND_URL) frameAncestors.push(process.env.PROD_BACKEND_URL);
@@ -141,7 +141,7 @@ app.use(passport.session());
 
 // --- Routes ---
 app.get('/', (req, res) => {
-  res.send(`API for ${PROJECT_NAME} is running at /api`);
+  res.send('API for ' + PROJECT_NAME + ' is running at /api');
 });
 
 app.use('/api', indexRouter);

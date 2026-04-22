@@ -12,15 +12,3 @@ A full-stack MEAN application (MongoDB, Express, Angular, Node) generated with a
 
 ### 1. Configure Environment
 A `.env.local` file is located at the root. Update your `MONGODB_URI` if needed.
-
-### 2. Run Backend
-```bash
-cd backend
-npm start
-```
-
-### 3. Run Frontend
-```bash
-cd frontend
-npm start
-```
