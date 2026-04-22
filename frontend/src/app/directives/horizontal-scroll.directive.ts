@@ -12,8 +12,6 @@ export class HorizontalScrollDirective implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    // We must use a native listener with { passive: false } to allow preventDefault()
-    // Standard Angular (wheel) bindings are often passive by default in modern browsers.
     this.el.addEventListener('wheel', this.onWheel, { passive: false });
   }
 
