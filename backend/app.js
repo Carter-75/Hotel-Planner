@@ -25,12 +25,13 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const helmet = require('helmet');
 const session = require('express-session');
+const MongoStore = require('connect-mongo');
 const passport = require('passport');
 
 const app = express();
 
 // --- Configuration ---
-const isProd = process.env.PRODUCTION === 'true' && process.env.NODE_ENV === 'production';
+const isProd = (process.env.PRODUCTION === 'true' && process.env.NODE_ENV === 'production') || process.env.VERCEL === '1';
 const prodUrl = process.env.PROD_FRONTEND_URL;
 const PROJECT_NAME = process.env.PROJECT_NAME || 'Portfolio Project';
 
@@ -162,9 +163,15 @@ app.use(
     secret: process.env.SESSION_SECRET || 'secret',
     resave: false,
     saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGODB_URI,
+      collectionName: 'sessions',
+      ttl: 14 * 24 * 60 * 60 // 14 days
+    }),
     cookie: {
       secure: isProd, 
-      sameSite: isProd ? 'none' : 'lax'
+      sameSite: isProd ? 'none' : 'lax',
+      maxAge: 14 * 24 * 60 * 60 * 1000 // 14 days
     }
   })
 );
