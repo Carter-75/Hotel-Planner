@@ -20,6 +20,7 @@
     "@angular/router": "^21.2.0",
     "bcryptjs": "^3.0.3",
     "concurrently": "^8.2.2",
+    "connect-mongo": "^5.1.0",
     "cookie-parser": "~1.4.6",
     "cors": "^2.8.5",
     "debug": "~2.6.9",

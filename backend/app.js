@@ -86,27 +86,45 @@ app.get('/api/health', async (req, res) => {
 // --- MongoDB Setup ---
 const mongoURI = process.env.MONGODB_URI;
 
+// Global caching for Mongoose to prevent connection exhaustion on Vercel
+let cached = global.mongoose;
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
+
 const connectDB = async () => {
-  if (mongoose.connection.readyState >= 1) return;
+  if (cached.conn) return cached.conn;
   
   if (!mongoURI) {
     console.warn('WARN: No MONGODB_URI found in environment!');
-    return;
+    return null;
+  }
+
+  if (!cached.promise) {
+    const opts = {
+      bufferCommands: false,
+      maxPoolSize: 5, // Small pool for serverless
+      serverSelectionTimeoutMS: 5000,
+      connectTimeoutMS: 10000
+    };
+
+    console.log('INFO: Connecting to MongoDB (New Connection)...');
+    cached.promise = mongoose.connect(mongoURI, opts).then((m) => {
+      console.log('OK: Connected to MongoDB');
+      return m;
+    });
   }
 
   try {
-    console.log('INFO: Connecting to MongoDB...');
-    await mongoose.connect(mongoURI, {
-      serverSelectionTimeoutMS: 5000,
-      connectTimeoutMS: 10000
-    });
-    console.log('OK: Connected to MongoDB');
+    cached.conn = await cached.promise;
   } catch (err) {
+    cached.promise = null;
     console.error('ERROR: MongoDB Connection Failed:', err.message);
   }
+  return cached.conn;
 };
 
-// Initial connection
+// Initial connection call
 connectDB();
 
 // --- Middlewares ---
@@ -173,7 +191,12 @@ if (process.env.MONGODB_URI) {
   sessionConfig.store = MongoStore.create({
     mongoUrl: process.env.MONGODB_URI,
     collectionName: 'sessions',
-    ttl: 14 * 24 * 60 * 60 // 14 days
+    ttl: 14 * 24 * 60 * 60, // 14 days
+    // Use the same connection options to ensure stability
+    mongoOptions: {
+      maxPoolSize: 5,
+      serverSelectionTimeoutMS: 5000
+    }
   });
 } else {
   console.warn('WARN: MONGODB_URI missing. Sessions will be volatile (MemoryStore).');
