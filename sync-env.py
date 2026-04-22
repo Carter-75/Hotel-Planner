@@ -9,10 +9,10 @@ def sync_vercel_env():
     env_path = next((c for c in candidates if c.exists()), None)
     
     if not env_path:
-        print("?? No .env or .env.local file found in the root. Skipping sync.")
+        print(">> No .env or .env.local file found in the root. Skipping sync.")
         return
 
-    print(f"ðŸš€ Vercel Watcher: Syncing {env_path.name} to Production Vault...")
+    print(f">> Vercel Watcher: Syncing {env_path.name} to Production Vault...")
     
     # Define project slug
     project_slug = "hotel-planner-black" # Match your Vercel project name
@@ -50,7 +50,7 @@ def sync_vercel_env():
                     else:
                         print(f"   Synced: {key}")
 
-        print("âœ… Vercel Vault is now up to date.")
+        print("OK: Vercel Vault is now up to date.")
 
     except Exception as e:
         print(f"Error during Vercel sync: {e}")
