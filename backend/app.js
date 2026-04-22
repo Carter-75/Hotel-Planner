@@ -163,9 +163,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      // Browsers like Chrome reject 'secure' cookies on http://localhost.
-      // We must force this to false for local development to ensure sessions persist.
-      secure: isProd && !req.hostname.includes('localhost') && !req.hostname.includes('127.0.0.1'), 
+      secure: isProd, 
       sameSite: isProd ? 'none' : 'lax'
     }
   })
