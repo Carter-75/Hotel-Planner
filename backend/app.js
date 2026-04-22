@@ -1,23 +1,44 @@
-// Explicit Environment Resolution
+// --- Environment and Dependencies ---
 const path = require('path');
 const fs = require('fs');
-const resolveEnvPath = () => {
-  const candidates = [path.join(process.cwd(), '.env.local'), path.join(process.cwd(), 'backend', '.env.local')];
-  for (const c of candidates) { if (fs.existsSync(c)) return c; }
-  return candidates[0];
-};
-require('dotenv').config({ path: resolveEnvPath() });
-const express = require('express');
+const dns = require('node:dns');
+dns.setServers(['8.8.8.8', '1.1.1.1']);
 
+const resolveEnvPath = () => {
+  const candidates = [
+    path.join(process.cwd(), '.env.local'), 
+    path.join(process.cwd(), 'backend', '.env.local'),
+    path.join(__dirname, '../.env.local')
+  ];
+  for (const c of candidates) { if (fs.existsSync(c)) return c; }
+  return null;
+};
+const envPath = resolveEnvPath();
+if (envPath) require('dotenv').config({ path: envPath });
+else require('dotenv').config(); // Fallback to system env (Vercel)
+
+// --- Initialization ---
+const express = require('express');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const helmet = require('helmet');
+const session = require('express-session');
+const passport = require('passport');
 
 const app = express();
 
-require('dotenv').config({ path: require('path').join(__dirname, '../.env.local') });
+// --- Models & Routers (Must be before diagnostic routes) ---
+require('./config/passport')(passport);
+
+const indexRouter = require('./routes/index');
+const authRouter = require('./routes/auth');
+const hotelRouter = require('./routes/hotels');
+const reviewRouter = require('./routes/reviews');
+const userActionsRouter = require('./routes/user-actions');
+const adminRouter = require('./routes/admin');
+
 
 // --- Diagnostic Routes (Moved up for early availability) ---
 app.get('/api/health', async (req, res) => {
@@ -71,18 +92,10 @@ try {
   console.error('FATAL: Failed to load aiRouter:', err);
 }
 
-const session = require('express-session');
-const passport = require('passport');
+// Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
 
-// Passport configuration
-require('./config/passport')(passport);
-
-const indexRouter = require('./routes/index');
-const authRouter = require('./routes/auth');
-const hotelRouter = require('./routes/hotels');
-const reviewRouter = require('./routes/reviews');
-const userActionsRouter = require('./routes/user-actions');
-const adminRouter = require('./routes/admin');
 
 const PROJECT_NAME = process.env.PROJECT_NAME || 'Portfolio Project';
 

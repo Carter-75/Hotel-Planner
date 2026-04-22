@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
 const Review = require('../models/review');
+const Hotel = require('../models/hotel');
 const { isAdmin } = require('../middleware/auth');
 
 /**
@@ -80,6 +81,34 @@ router.delete('/users/:id', isAdmin, async (req, res) => {
     if (!user) return res.status(404).json({ error: 'User not found' });
     
     res.json({ message: 'User deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * @route   POST /api/admin/seed-bulk
+ * @desc    Bulk seed hotels (Admin Only)
+ * @access  Private (Admin Only)
+ */
+router.post('/seed-bulk', isAdmin, async (req, res) => {
+  try {
+    const { hotels, clearExisting } = req.body;
+
+    if (!Array.isArray(hotels)) {
+      return res.status(400).json({ error: 'Data must be an array of hotels' });
+    }
+
+    if (clearExisting) {
+      console.log('Admin: Clearing all hotels before bulk seed...');
+      await Hotel.deleteMany({});
+    }
+
+    const result = await Hotel.insertMany(hotels);
+    res.json({ 
+      message: `Successfully seeded ${result.length} hotels.`,
+      count: result.length 
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

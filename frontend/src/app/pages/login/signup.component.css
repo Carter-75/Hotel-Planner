@@ -1,1 +1,59 @@
-/* Signup Styles */
+.auth-page {
+  animation: fadeIn 0.6s ease forwards;
+}
+
+.welcome-badge {
+  background: rgba(79, 70, 229, 0.1);
+  color: var(--primary);
+  padding: 6px 16px;
+  border-radius: 100px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  width: fit-content;
+  margin: 0 auto 16px auto;
+  border: 1px solid rgba(79, 70, 229, 0.2);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.signup-form {
+  margin-top: 8px;
+}
+
+.text-muted {
+  color: var(--text-muted);
+}
+
+/* Mobile Responsive */
+@media (max-width: 480px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .auth-card {
+    padding: 32px 24px;
+    margin: 0 16px;
+  }
+}
+
+/* Add a subtle entrance animation to the inputs */
+.form-input {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.form-input:hover {
+  border-color: #cbd5e1;
+}
+
+.btn-primary {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
