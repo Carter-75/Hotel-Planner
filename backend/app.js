@@ -88,13 +88,8 @@ app.get('/api/debug-bundle', async (req, res) => {
   }
 });
 
-let aiRouter;
-try {
-  // We assume aiRouter might be added later or exist in certain flavors
-  // For the general template, we'll keep it as a placeholder or empty
-} catch (err) {
-  console.error('FATAL: Failed to load aiRouter:', err);
-}
+
+
 
 // Session and Passport will be configured in the Middleware section below
 
@@ -181,9 +176,8 @@ app.use('/api/hotels', hotelRouter);
 app.use('/api/reviews', reviewRouter);
 app.use('/api/user', userActionsRouter);
 app.use('/api/admin', adminRouter);
-if (aiRouter) {
-  app.use('/api/ai', aiRouter);
-}
+
+
 
 // Error handler
 app.use((err, req, res, next) => {
