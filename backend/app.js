@@ -158,23 +158,28 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 // Sessions
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || 'secret',
-    resave: false,
-    saveUninitialized: false,
-    store: MongoStore.create({
-      mongoUrl: process.env.MONGODB_URI,
-      collectionName: 'sessions',
-      ttl: 14 * 24 * 60 * 60 // 14 days
-    }),
-    cookie: {
-      secure: isProd, 
-      sameSite: isProd ? 'none' : 'lax',
-      maxAge: 14 * 24 * 60 * 60 * 1000 // 14 days
-    }
-  })
-);
+const sessionConfig = {
+  secret: process.env.SESSION_SECRET || 'secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: isProd, 
+    sameSite: isProd ? 'none' : 'lax',
+    maxAge: 14 * 24 * 60 * 60 * 1000 // 14 days
+  }
+};
+
+if (process.env.MONGODB_URI) {
+  sessionConfig.store = MongoStore.create({
+    mongoUrl: process.env.MONGODB_URI,
+    collectionName: 'sessions',
+    ttl: 14 * 24 * 60 * 60 // 14 days
+  });
+} else {
+  console.warn('WARN: MONGODB_URI missing. Sessions will be volatile (MemoryStore).');
+}
+
+app.use(session(sessionConfig));
 
 // Passport
 app.use(passport.initialize());
@@ -205,9 +210,10 @@ app.use('/api/admin', adminRouter);
 
 // Error handler
 app.use((err, req, res, next) => {
+  console.error('API Error:', err);
   res.status(err.status || 500).json({
     message: err.message,
-    error: req.app.get('env') === 'development' ? err : {}
+    error: isProd ? {} : err
   });
 });
 

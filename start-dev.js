@@ -5,7 +5,7 @@ const path = require('path');
 
 async function start() {
   try {
-    console.log('🔍 Finding available ports...');
+    console.log('Finding available ports...');
 
     // 1. Find Backend Port (Start at 3000)
     portfinder.basePort = 3000;
@@ -15,8 +15,8 @@ async function start() {
     portfinder.basePort = 4200;
     const frontendPort = await portfinder.getPortPromise();
 
-    console.log(`🚀 Backend will run on: http://localhost:${backendPort}`);
-    console.log(`🎨 Frontend will run on: http://localhost:${frontendPort}`);
+    console.log(`Backend will run on: http://localhost:${backendPort}`);
+    console.log(`Frontend will run on: http://localhost:${frontendPort}`);
 
     // 3. Create Dynamic Proxy Configuration
     const proxyConfig = {
@@ -32,10 +32,10 @@ async function start() {
 
     const proxyPath = path.join(__dirname, 'frontend', 'proxy.conf.json');
     fs.writeFileSync(proxyPath, JSON.stringify(proxyConfig, null, 2));
-    console.log('🛠️  Generated frontend/proxy.conf.json');
+    console.log('Generated frontend/proxy.conf.json');
 
     // 4. Start Backend
-    console.log('📡 Starting Backend...');
+    console.log('Starting Backend...');
     const backend = spawn('cmd', ['/c', 'npm', 'run', 'dev'], {
       cwd: path.join(__dirname, 'backend'),
       env: { ...process.env, PORT: backendPort },
@@ -43,7 +43,7 @@ async function start() {
     });
 
     // 5. Start Frontend
-    console.log('📦 Starting Frontend...');
+    console.log('Starting Frontend...');
     const frontend = spawn('cmd', ['/c', 'npm', 'run', 'start', '--', `--port=${frontendPort}`, '--proxy-config=proxy.conf.json'], {
       cwd: path.join(__dirname, 'frontend'),
       stdio: 'inherit'
@@ -57,7 +57,7 @@ async function start() {
     });
 
   } catch (err) {
-    console.error('❌ Failed to start development servers:', err);
+    console.error('Failed to start development servers:', err);
     process.exit(1);
   }
 }

@@ -11,7 +11,7 @@
             <form id="admin-filter-bar" (submit)="refresh(); $event.preventDefault()">
                 <div class="filter-group">
                     <div class="input-wrapper">
-                        <i class="search-icon">🔍</i>
+                        <i class="search-icon"></i>
                         <input type="text" id="user-filter" name="username" [(ngModel)]="usernameFilterInput"
                             placeholder="Search Email or Name..." (ngModelChange)="refresh()" class="form-input">
                     </div>
