@@ -135,7 +135,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: isProd, // Only true on Vercel/HTTPS
+      secure: isProd,
       sameSite: isProd ? 'none' : 'lax'
     }
   })
