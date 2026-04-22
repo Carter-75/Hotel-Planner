@@ -10,8 +10,9 @@ export class ApiService {
   
   // Picks the right API URL based on where we are (local vs prod)
   private get apiUrl(): string {
-    const isProd = ('false' as string) === 'true';
-    const prodBackend = '' as string;
+    const isProd = ('__PRODUCTION__' as string) === 'true';
+    const prodBackend = '__PROD_BACKEND_URL__' as string;
+    const prodFrontend = '__PROD_FRONTEND_URL__' as string;
     
     const host = window.location.hostname;
     const isLocal = host === 'localhost' || host === '127.0.0.1';
