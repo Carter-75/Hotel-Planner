@@ -88,15 +88,18 @@ const PROJECT_NAME = process.env.PROJECT_NAME || 'Portfolio Project';
 
 // --- MongoDB Setup ---
 const mongoURI = process.env.MONGODB_URI;
-    if (mongoURI) {
-  mongoose.connect(mongoURI)
+if (mongoURI) {
+  console.log('INFO: Attempting to connect to MongoDB...');
+  mongoose.connect(mongoURI, {
+    serverSelectionTimeoutMS: 5000 // Stop trying after 5 seconds
+  })
     .then(() => console.log('OK: Connected to MongoDB'))
     .catch(err => {
-      console.error('WARN: MongoDB Connection Error (Graceful):', err.message);
-      console.log('INFO: Continuing without database features...');
+      console.error('ERROR: MongoDB Connection Failed:', err.message);
+      console.log('INFO: The application will return 500/503 errors for database-dependent routes.');
     });
 } else {
-  console.log('INFO: No MONGODB_URI found in .env.local. Database features disabled.');
+  console.warn('WARN: No MONGODB_URI found! Database features are completely disabled.');
 }
 
 // --- Middlewares ---

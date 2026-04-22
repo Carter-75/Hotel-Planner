@@ -13,6 +13,18 @@ const crypto = require('crypto');
 router.post('/check-status', async (req, res) => {
   try {
     const { email } = req.body;
+    
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
+    }
+
+    // Check if database is connected
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({ 
+        error: 'Database is currently offline. Please check your MONGODB_URI in .env.local.' 
+      });
+    }
+
     const user = await User.findOne({ email: email.toLowerCase() });
     
     if (!user) {
