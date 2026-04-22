@@ -20,14 +20,24 @@ const app = express();
 require('dotenv').config({ path: require('path').join(__dirname, '../.env.local') });
 
 // --- Diagnostic Routes (Moved up for early availability) ---
-app.get('/api/health', (req, res) => {
-  res.json({
-    status: 'online',
-    cwd: process.cwd(),
-    dirname: __dirname,
-    env: process.env.PRODUCTION === 'true' ? 'production' : 'development',
-    timestamp: new Date().toISOString()
-  });
+app.get('/api/health', async (req, res) => {
+  const isConnected = mongoose.connection.readyState === 1;
+  try {
+    const hotelCount = await mongoose.model('Hotel').countDocuments();
+    res.json({ 
+      status: 'OK', 
+      database: isConnected ? 'Connected' : 'Disconnected',
+      hotelCount: hotelCount,
+      timestamp: new Date().toISOString() 
+    });
+  } catch (err) {
+    res.json({ 
+      status: 'OK', 
+      database: isConnected ? 'Connected' : 'Disconnected',
+      hotelCount: 0,
+      timestamp: new Date().toISOString() 
+    });
+  }
 });
 
 app.get('/api/debug-bundle', async (req, res) => {

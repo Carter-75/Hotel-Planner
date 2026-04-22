@@ -1,5 +1,5 @@
 {
-  "name": "Hotel-Planner-backend",
+  "name": "hotel-planner-backend",
   "version": "1.0.0",
   "scripts": {
     "start": "node ./bin/www",

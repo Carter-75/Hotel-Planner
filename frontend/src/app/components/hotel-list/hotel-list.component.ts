@@ -17,16 +17,19 @@ import { HotelCardComponent } from '../hotel-card/hotel-card.component';
   styles: [`
     .hotel-list-container {
       display: grid;
-      gap: 20px;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      padding: 20px 0;
+      gap: 32px;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      padding: 0;
     }
     .empty-msg {
       grid-column: 1 / -1;
       text-align: center;
-      padding: 40px;
-      color: #64748b;
-      font-style: italic;
+      padding: 80px 40px;
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      background: white;
+      border-radius: var(--radius-lg);
+      border: 1px dashed #e2e8f0;
     }
   `]
 })

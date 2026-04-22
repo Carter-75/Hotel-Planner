@@ -12,6 +12,7 @@ import { AuthService } from '../../services/auth.service';
 })
 export class LoginComponent {
   private authService = inject(AuthService);
+  private router = inject(Router);
   
   // The fields for the login form
   email = signal('');
@@ -34,10 +35,10 @@ export class LoginComponent {
         if (!status.exists) {
           // New user: Save their email/pass in memory and go to signup page for their names
           this.authService.pendingCredentials.set({ email, password });
-          inject(Router).navigate(['/signup']);
+          this.router.navigate(['/signup']);
         } else if (status.isBanned) {
           // Banned user: Go to the "You are banned" jail page
-          inject(Router).navigate(['/banned']);
+          this.router.navigate(['/banned']);
         } else {
           // Existing user: Just sign them in normally
           this.authService.login({ email, password }).subscribe({

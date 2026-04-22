@@ -1,11 +1,12 @@
 import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
+import { DecimalPipe } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-hotel-card',
   standalone: true,
-  imports: [],
+  imports: [DecimalPipe],
   templateUrl: './hotel-card.component.html',
   styleUrls: ['./hotel-card.component.css']
 })

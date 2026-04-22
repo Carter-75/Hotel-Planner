@@ -1,10 +1,22 @@
-.search-results-view {
-    border-top: 1px solid #e2e8f0;
-    padding-top: 40px;
-    margin-top: 20px;
+.search-results-wrapper {
+    margin-top: 40px;
 }
-h2 {
-    color: #1e293b;
-    margin-bottom: 24px;
+
+.results-header {
+    margin-bottom: 32px;
+}
+
+.section-title {
+    font-size: 1.75rem;
     font-weight: 700;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.result-count {
+    color: var(--text-muted);
+    font-weight: 400;
+    font-size: 1.25rem;
 }
