@@ -6,7 +6,7 @@ dns.setServers(['8.8.8.8', '1.1.1.1']);
 
 const resolveEnvPath = () => {
   const candidates = [
-    path.join(process.cwd(), '.env.local'), 
+    path.join(process.cwd(), '.env.local'),
     path.join(process.cwd(), 'backend', '.env.local'),
     path.join(__dirname, '../.env.local')
   ];
@@ -39,24 +39,28 @@ const reviewRouter = require('./routes/reviews');
 const userActionsRouter = require('./routes/user-actions');
 const adminRouter = require('./routes/admin');
 
+// --- Models & Routers Initialization ---
+require('./config/passport')(passport);
+
+
 
 // --- Diagnostic Routes (Moved up for early availability) ---
 app.get('/api/health', async (req, res) => {
   const isConnected = mongoose.connection.readyState === 1;
   try {
     const hotelCount = await mongoose.model('Hotel').countDocuments();
-    res.json({ 
-      status: 'OK', 
+    res.json({
+      status: 'OK',
       database: isConnected ? 'Connected' : 'Disconnected',
       hotelCount: hotelCount,
-      timestamp: new Date().toISOString() 
+      timestamp: new Date().toISOString()
     });
   } catch (err) {
-    res.json({ 
-      status: 'OK', 
+    res.json({
+      status: 'OK',
       database: isConnected ? 'Connected' : 'Disconnected',
       hotelCount: 0,
-      timestamp: new Date().toISOString() 
+      timestamp: new Date().toISOString()
     });
   }
 });
@@ -92,9 +96,8 @@ try {
   console.error('FATAL: Failed to load aiRouter:', err);
 }
 
-// Passport middleware
-app.use(passport.initialize());
-app.use(passport.session());
+// Session and Passport will be configured in the Middleware section below
+
 
 
 const PROJECT_NAME = process.env.PROJECT_NAME || 'Portfolio Project';
@@ -130,7 +133,11 @@ app.use(
   session({
     secret: process.env.SESSION_SECRET || 'secret',
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    cookie: {
+      secure: isProd, // Only true on Vercel/HTTPS
+      sameSite: isProd ? 'none' : 'lax'
+    }
   })
 );
 
