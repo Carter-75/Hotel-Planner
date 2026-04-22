@@ -1,7 +1,9 @@
 #reviews {
-    padding: 40px 20px;
+    padding: 100px 20px 40px; /* Top padding to clear fixed nav */
     max-width: 800px;
     margin: 0 auto;
+    height: 100%;
+    overflow-y: auto; /* Enable internal scrolling as global scroll is locked */
 }
 
 .reviews-header {

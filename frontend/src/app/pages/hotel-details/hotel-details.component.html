@@ -19,7 +19,7 @@
                     <section class="amenities-section">
                         <h2>Amenities</h2>
                         <div class="amenities-grid">
-                            @for (item of hotel().amenities; track item) {
+                            @for (item of hotel().amenities; track $index) {
                                 <div class="amenity-item">
                                     <span class="dot"></span>
                                     {{ item }}
@@ -46,7 +46,6 @@
                         <button type="button" class="secondary-btn" [class.is-saved]="isSaved()" (click)="toggleSave()">
                             {{ isSaved() ? 'Unsave Hotel' : 'Save Hotel' }}
                         </button>
-                        <button type="button" class="book-btn">Book Now</button>
                     </div>
                 </aside>
             </div>

@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { ApiService } from './api.service';
 import { catchError, map, tap } from 'rxjs/operators';
-import { of, Observable } from 'rxjs';
+import { of, Observable, forkJoin } from 'rxjs';
 
 // This is what a user object looks like in our app
 export interface User {
@@ -31,6 +31,10 @@ export class AuthService {
   private _currentUser = signal<User | null>(null); // Who is logged in?
   private _isLoading = signal<boolean>(true); // Are we still checking auth?
   readonly pendingCredentials = signal<{email: string, password: string} | null>(null); // Temp storage for signup
+  
+  // Storage for toggles that haven't been committed to the DB yet
+  // Maps hotelId -> final target state (true = saved, false = unsaved)
+  private _pendingSaves = new Map<string, boolean>();
 
   // Computed shortcuts for auth state
   readonly currentUser = this._currentUser.asReadonly();
@@ -41,10 +45,66 @@ export class AuthService {
   /**
    * Check if a hotel is in the user's saved list
    */
-  // Quick check if a hotel id is in our saved list
+  // Quick check if a hotel id is in our saved list (accounting for pending changes)
   isHotelSaved(hotelId: string): boolean {
+    // If there's a pending change for this hotel, trust that first
+    if (this._pendingSaves.has(hotelId)) {
+      return this._pendingSaves.get(hotelId) === true;
+    }
+
     const user = this._currentUser();
     return !!user?.savedHotels?.includes(hotelId);
+  }
+
+  /**
+   * Toggles the local state in a buffer without hitting the API immediately
+   */
+  toggleBufferedSave(hotelId: string): void {
+    const currentState = this.isHotelSaved(hotelId);
+    const targetState = !currentState;
+
+    // If the target state matches the actual DB state, we can just remove the pending change
+    const dbState = !!this._currentUser()?.savedHotels?.includes(hotelId);
+    if (targetState === dbState) {
+      this._pendingSaves.delete(hotelId);
+    } else {
+      this._pendingSaves.set(hotelId, targetState);
+    }
+  }
+
+  /**
+   * Commits all pending save/unsave actions to the backend
+   * Returns an observable that completes when all requests are finished
+   */
+  commitSaves(): Observable<any> {
+    if (this._pendingSaves.size === 0) return of(true);
+
+    const changes = Array.from(this._pendingSaves.entries());
+    this._pendingSaves.clear(); // Clear immediately so we don't double-commit
+    
+    console.log(`[AuthService] Committing ${changes.length} pending save changes...`);
+
+    const requests = changes.map(([hotelId, targetState]) => {
+      const dbState = !!this._currentUser()?.savedHotels?.includes(hotelId);
+      
+      if (dbState !== targetState) {
+        return this.api.toggleSaveHotel(hotelId).pipe(
+          tap(savedIds => {
+            const user = this._currentUser();
+            if (user) {
+              this._currentUser.set({ ...user, savedHotels: savedIds });
+            }
+          }),
+          catchError(err => {
+            console.error(`Failed to sync hotel ${hotelId}:`, err);
+            return of(null);
+          })
+        );
+      }
+      return of(null);
+    });
+
+    return forkJoin(requests);
   }
 
   /**
@@ -62,6 +122,18 @@ export class AuthService {
     );
   }
 
+  /**
+   * Force save a hotel in local state (used for auto-save on review)
+   */
+  forceSaveLocal(hotelId: string): void {
+    const user = this._currentUser();
+    if (user && !user.savedHotels?.includes(hotelId)) {
+      const newSaves = [...(user.savedHotels || []), hotelId];
+      this._currentUser.set({ ...user, savedHotels: newSaves });
+    }
+  }
+
+  // Constructor logic simplified
   constructor() {
     this.checkAuthStatus(); // Check login status as soon as the app starts
   }

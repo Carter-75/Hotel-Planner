@@ -1,12 +1,14 @@
 .hotel-card {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    padding: 20px;
+    height: 180px; /* Fixed height for virtual scroll precision */
+    gap: 12px;
+    padding: 16px 20px;
     cursor: pointer;
     background: white;
     border: 1px solid #e2e8f0;
     border-radius: 12px;
+    overflow: hidden; /* Ensure content doesn't expand card */
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
@@ -24,8 +26,11 @@
 .hotel-name {
     font-size: 1.125rem;
     font-weight: 700;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
     color: #0f172a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Prevent long names from adding lines */
 }
 
 .hotel-location {

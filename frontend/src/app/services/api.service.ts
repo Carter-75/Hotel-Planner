@@ -63,34 +63,34 @@ export class ApiService {
     return this.http.delete<T>(`${this.apiUrl}/${endpoint}`, { withCredentials: true });
   }
 
-  // Get all hotels using filters
-  getHotels(filters: any): Observable<any[]> {
-    return this.getData<any[]>('hotels', filters);
+  // Get hotels using filters with pagination support
+  getHotels(filters: any): Observable<any> {
+    return this.getData<any>('hotels', filters);
   }
 
   // Get just one hotel by its ID
   getHotel(id: string): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/hotels/${id}`);
+    return this.getData<any>(`hotels/${id}`);
   }
 
   // Fetch all reviews for a specific hotel
   getReviews(hotelId: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/reviews/hotel/${hotelId}`);
+    return this.getData<any[]>(`reviews/hotel/${hotelId}`);
   }
 
   // Save or unsave a hotel for the logged-in user
   toggleSaveHotel(hotelId: string): Observable<string[]> {
-    return this.http.post<string[]>(`${this.apiUrl}/user/save-hotel/${hotelId}`, {}, { withCredentials: true });
+    return this.postData<string[]>(`user/save-hotel/${hotelId}`, {});
   }
 
   // Get the current user's list of saved hotels
   getSavedHotels(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/user/saved-hotels`, { withCredentials: true });
+    return this.getData<any[]>('user/saved-hotels');
   }
 
-  // Admin: Get a list of all users on the platform
-  getAllUsers(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/admin/users`, { withCredentials: true });
+  // Admin: Get a list of all users on the platform with pagination and filters
+  getAllUsers(params?: any): Observable<any> {
+    return this.getData<any>('admin/users', params);
   }
 
   // Admin: Change a user's role (User <-> Admin)

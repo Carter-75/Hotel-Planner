@@ -30,7 +30,7 @@ const passport = require('passport');
 const app = express();
 
 // --- Configuration ---
-const isProd = process.env.PRODUCTION === 'true';
+const isProd = process.env.PRODUCTION === 'true' && process.env.NODE_ENV === 'production';
 const prodUrl = process.env.PROD_FRONTEND_URL;
 const PROJECT_NAME = process.env.PROJECT_NAME || 'Portfolio Project';
 
@@ -151,14 +151,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// Apply DB check to all /api routes
-app.use('/api', dbCheck);
-
-app.use(cors({
-  origin: true,
-  credentials: true
-}));
-
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -171,7 +163,9 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: isProd,
+      // Browsers like Chrome reject 'secure' cookies on http://localhost.
+      // We must force this to false for local development to ensure sessions persist.
+      secure: isProd && !req.hostname.includes('localhost') && !req.hostname.includes('127.0.0.1'), 
       sameSite: isProd ? 'none' : 'lax'
     }
   })
@@ -180,6 +174,14 @@ app.use(
 // Passport
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Apply DB check to all /api routes
+app.use('/api', dbCheck);
+
+app.use(cors({
+  origin: true,
+  credentials: true
+}));
 
 // --- Routes ---
 app.get('/', (req, res) => {

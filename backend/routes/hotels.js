@@ -11,26 +11,59 @@ const { isAdmin } = require('../middleware/auth');
 // Search for hotels based on location, price, and star rating
 router.get('/', async (req, res) => {
   try {
-    const { location, minPrice, maxPrice, rating } = req.query;
+    const { location, minPrice, maxPrice, rating, page = 1, limit = 20 } = req.query;
     let query = {};
+    let sort = { createdAt: -1 };
+    let projection = {};
 
     // Filter by city or address
     if (location) {
-      query.$text = { $search: location };
+      // Split by commas and wrap each part in quotes to force an 'AND' phrase search.
+      // E.g. "La Crosse, WI" -> "\"La Crosse\" \"WI\""
+      // This prevents "La" matching "LA" (Louisiana) unless "Crosse" is also present.
+      const phraseQuery = location.split(',')
+        .map(p => `"${p.trim()}"`)
+        .join(' ');
+
+      query.$text = { $search: phraseQuery };
+      
+      // During a text search, we MUST sort by relevance score
+      // otherwise generic 'USA' matches will clutter the results.
+      projection = { score: { $meta: "textScore" } };
+      sort = { score: { $meta: "textScore" } };
     }
+
     // Filter by price range
     if (minPrice || maxPrice) {
       query.price = {};
-      if (minPrice) query.price.$gte = Number(minPrice);
-      if (maxPrice) query.price.$lte = Number(maxPrice);
+      const min = Number(minPrice);
+      const max = Number(maxPrice);
+      if (!isNaN(min) && minPrice !== null && minPrice !== undefined) query.price.$gte = min;
+      if (!isNaN(max) && maxPrice !== null && maxPrice !== undefined) query.price.$lte = max;
+      if (Object.keys(query.price).length === 0) delete query.price;
     }
+    
     // Filter by minimum stars
     if (rating) {
-      query.stars = { $gte: Number(rating) };
+      const r = Number(rating);
+      if (!isNaN(r)) query.stars = { $gte: r };
     }
 
-    const hotels = await Hotel.find(query).sort({ createdAt: -1 });
-    res.json(hotels);
+    const skip = (Number(page) - 1) * Number(limit);
+    
+    const total = await Hotel.countDocuments(query);
+    
+    const hotels = await Hotel.find(query, projection)
+      .sort(sort)
+      .skip(skip)
+      .limit(Number(limit));
+
+    res.json({
+      hotels,
+      total,
+      limit: Number(limit),
+      page: Number(page)
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

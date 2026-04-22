@@ -1,29 +1,37 @@
-<section id="add-review">
-    <header class="add-review-header">
-        <button type="button" class="back-link-btn" (click)="cancel()">← Back</button>
-        <h2>Add Review for {{ hotelName() }}</h2>
-    </header>
+<section id="add-review" class="main-viewport fade-in">
+    <div class="review-page-container">
+        <header class="review-header">
+            <button type="button" class="back-link-btn" (click)="cancel()">← Back to Hotel</button>
+            <h1 class="page-title">Share Your Experience</h1>
+            <p class="hotel-sub">Reviewing <strong>{{ hotelName() }}</strong></p>
+        </header>
 
-    <form id="add-review-form" (submit)="submitReview(); $event.preventDefault()">
-        <div class="form-group">
-            <label for="rating">Rating (1-5)</label>
-            <select id="rating" name="rating" [(ngModel)]="rating" required>
-                <option value="5">5 - Excellent</option>
-                <option value="4">4 - Very Good</option>
-                <option value="3">3 - Good</option>
-                <option value="2">2 - Fair</option>
-                <option value="1">1 - Poor</option>
-            </select>
-        </div>
+        <form id="add-review-form" (submit)="submitReview(); $event.preventDefault()" class="glass card">
+            <div class="form-group">
+                <label for="rating" class="label-title">How would you rate your stay?</label>
+                <div class="rating-select-wrapper">
+                    <select id="rating" name="rating" [(ngModel)]="rating" required class="form-input">
+                        <option [value]="5">5 - Excellent (Top Tier)</option>
+                        <option [value]="4">4 - Very Good (Satisfied)</option>
+                        <option [value]="3">3 - Good (Average)</option>
+                        <option [value]="2">2 - Fair (Could be better)</option>
+                        <option [value]="1">1 - Poor (Disappointed)</option>
+                    </select>
+                </div>
+            </div>
 
-        <div class="form-group">
-            <label for="comment">Message (Optional)</label>
-            <textarea id="comment" name="comment" rows="6" placeholder="Tell us about your stay..." [(ngModel)]="comment"></textarea>
-        </div>
+            <div class="form-group">
+                <label for="comment" class="label-title">Tell us more about it (Optional)</label>
+                <textarea id="comment" name="comment" rows="6" 
+                    placeholder="What did you love? Any tips for other travelers?" 
+                    [(ngModel)]="comment" class="form-input"></textarea>
+                <small class="hint">Written feedback is welcome but not required.</small>
+            </div>
 
-        <div class="form-actions">
-            <button type="button" class="secondary-btn" (click)="cancel()">Discard & Back</button>
-            <button type="submit" class="book-btn">Add Review</button>
-        </div>
-    </form>
+            <div class="form-actions">
+                <button type="button" class="btn-secondary" (click)="cancel()">Discard</button>
+                <button type="submit" class="btn-primary">Post Review</button>
+            </div>
+        </form>
+    </div>
 </section>

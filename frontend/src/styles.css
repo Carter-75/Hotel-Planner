@@ -25,6 +25,11 @@
   padding: 0;
 }
 
+html, body {
+  height: 100%;
+  overflow: hidden; /* Lock the main page scroll */
+}
+
 body {
   font-family: var(--primary-font);
   background-color: var(--bg-main);
@@ -38,6 +43,13 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
   color: var(--text-main);
   letter-spacing: -0.02em;
+}
+
+.main-content {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 /* Glassmorphism Utility */

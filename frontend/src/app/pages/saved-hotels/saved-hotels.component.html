@@ -1,11 +1,13 @@
 <section id="saved-hotels">
     <h2>Saved</h2>
 
-    <app-hotel-list 
-        [hotels]="savedHotels()" 
-        [emptyMessage]="isLoading() ? 'Loading your saved hotels...' : 'You haven\'t saved any hotels yet.'"
-        (savedStateChange)="fetchSavedHotels()">
-    </app-hotel-list>
+    <div class="list-wrapper">
+        <app-hotel-list 
+            [hotels]="savedHotels()" 
+            [emptyMessage]="isLoading() ? 'Loading your saved hotels...' : 'You haven\'t saved any hotels yet.'"
+            (savedStateChange)="fetchSavedHotels()">
+        </app-hotel-list>
+    </div>
 
     <div class="bottom-navigation">
         <button type="button" class="back-link" (click)="goBack()">Back</button>

@@ -22,7 +22,7 @@ export class HotelCardComponent {
     return this.authService.isHotelSaved(this.hotel._id);
   }
 
-  // Handle the save/unsave button click
+  // Handle the save/unsave button click (with buffering)
   toggleSave(event: Event) {
     event.stopPropagation(); // Don't trigger the card click
     
@@ -32,12 +32,9 @@ export class HotelCardComponent {
       return;
     }
 
-    this.authService.toggleHotelSave(this.hotel._id).subscribe({
-      next: () => {
-        this.savedStateChange.emit(this.hotel._id); // Tell the parent list to refresh
-      },
-      error: (err: any) => console.error('Toggle save failed:', err)
-    });
+    // Toggle the local buffer state
+    this.authService.toggleBufferedSave(this.hotel._id);
+    this.savedStateChange.emit(this.hotel._id); 
   }
 
   // Open the full detail view for this hotel

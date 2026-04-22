@@ -18,7 +18,7 @@
     </div>
 
     <div class="hotel-amenities">
-        @for (item of hotel.amenities.slice(0, 3); track item) {
+        @for (item of hotel.amenities.slice(0, 3); track $index) {
             <span class="amenity-tag">{{ item }}</span>
         }
         @if (hotel.amenities.length > 3) {

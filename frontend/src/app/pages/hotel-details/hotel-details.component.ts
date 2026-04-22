@@ -1,4 +1,4 @@
-import { Component, signal, inject, OnInit } from '@angular/core';
+import { Component, signal, inject, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Location } from '@angular/common';
 import { ApiService } from '../../services/api.service';
@@ -51,11 +51,7 @@ export class HotelDetailsComponent implements OnInit {
   toggleSave() {
     const h = this.hotel();
     if (!h) return;
-    
-    this.authService.toggleHotelSave(h._id).subscribe({
-      next: () => {},
-      error: (err: any) => console.error('Toggle save failed:', err)
-    });
+    this.authService.toggleBufferedSave(h._id);
   }
 
   goBack() {

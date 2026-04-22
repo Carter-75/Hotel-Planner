@@ -1,7 +1,8 @@
-import { Component, signal, inject, OnInit } from '@angular/core';
+import { Component, signal, inject, OnInit, OnDestroy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Location } from '@angular/common';
 import { ApiService } from '../../services/api.service';
+import { AuthService } from '../../services/auth.service';
 import { HotelListComponent } from '../../components/hotel-list/hotel-list.component';
 
 @Component({
@@ -13,6 +14,7 @@ import { HotelListComponent } from '../../components/hotel-list/hotel-list.compo
 })
 export class SavedHotelsComponent implements OnInit {
   private apiService = inject(ApiService);
+  private authService = inject(AuthService);
   private location = inject(Location);
   
   savedHotels = signal<any[]>([]);

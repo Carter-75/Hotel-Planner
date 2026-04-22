@@ -9,7 +9,6 @@ const User = require('../models/user');
 
 const admins = [
   'cartermoyer75@gmail.com',
-  'hello@carter-portfolio.fyi',
   'moyer6141@uwlax.edu'
 ];
 

@@ -1,1 +1,69 @@
-/* Banned Styles */
+#banned-view {
+    padding: 120px 20px 40px; /* Large top padding to clear nav */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    background: radial-gradient(circle at center, rgba(225, 29, 72, 0.05), transparent);
+}
+
+.banned-container {
+    max-width: 480px;
+    width: 100%;
+    padding: 48px;
+    text-align: center;
+    border-radius: 24px;
+    border: 1px solid rgba(225, 29, 72, 0.2);
+}
+
+.icon-warning {
+    font-size: 3rem;
+    margin-bottom: 24px;
+}
+
+.page-title {
+    font-size: 2rem;
+    color: #e11d48; /* Crisis red */
+    margin-bottom: 16px;
+    letter-spacing: -0.04em;
+}
+
+.error-message {
+    color: var(--text-dark);
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 24px;
+}
+
+.contact-support {
+    background: #fff1f2;
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 32px;
+    color: #be123c;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: center;
+}
+
+.btn-primary.w-full {
+    background: #e11d48;
+}
+
+.btn-primary.w-full:hover {
+    background: #be123c;
+    box-shadow: 0 0 20px rgba(225, 29, 72, 0.3);
+}
+
+.fade-in {
+    animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}

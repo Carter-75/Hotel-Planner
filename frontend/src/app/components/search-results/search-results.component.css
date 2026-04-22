@@ -1,22 +1,5 @@
 .search-results-wrapper {
-    margin-top: 40px;
-}
-
-.results-header {
-    margin-bottom: 32px;
-}
-
-.section-title {
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: var(--text-main);
+    height: 100%;
     display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.result-count {
-    color: var(--text-muted);
-    font-weight: 400;
-    font-size: 1.25rem;
+    flex-direction: column;
 }

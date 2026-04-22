@@ -1,10 +1,18 @@
-<section id="banned-view">
-    <div class="banned-container card">
-        <h2 class="error-heading">Access Denied</h2>
-        <p class="error-message">You are banned and can not use this app.</p>
+<section id="banned-view" class="main-viewport fade-in">
+    <div class="banned-container card glass">
+        <div class="icon-warning">⚠️</div>
+        <h1 class="page-title">Access Restricted</h1>
+        <p class="error-message">
+            Your account has been restricted. You currently do not have permission to access the 
+            <strong>HotelPlanner</strong> platform services.
+        </p>
         
+        <div class="contact-support">
+            <p>If you believe this is a mistake, please reach out to our administration team.</p>
+        </div>
+
         <div class="form-actions">
-            <button id="logout-banned" type="button" class="book-btn" (click)="logout()">Logout</button>
+            <button id="logout-banned" type="button" class="btn-primary w-full" (click)="logout()">Sign Out</button>
         </div>
     </div>
 </section>

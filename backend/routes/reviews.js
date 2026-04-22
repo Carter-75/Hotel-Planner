@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Review = require('../models/review');
+const User = require('../models/user');
 const { isAuthenticated, isAdmin } = require('../middleware/auth');
 
 /**
@@ -37,6 +38,12 @@ router.post('/', isAuthenticated, async (req, res) => {
       comment
     });
     const review = await newReview.save();
+
+    // Auto-save the hotel if not already saved (idempotent)
+    await User.findByIdAndUpdate(req.user.id, { 
+      $addToSet: { savedHotels: hotelId } 
+    });
+
     res.status(201).json(review);
   } catch (err) {
     res.status(400).json({ error: err.message });

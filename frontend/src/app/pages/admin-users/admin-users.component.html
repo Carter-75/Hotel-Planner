@@ -1,59 +1,114 @@
-<section id="admin-users">
-    <header class="admin-header">
-        <form id="admin-filter-bar" (submit)="$event.preventDefault()">
-            <div class="filter-group">
-                <label for="user-filter">Filter By:</label>
-                <input type="text" id="user-filter" name="username" [(ngModel)]="usernameFilter" placeholder="Email/Name/Stars...">
-                
-                <select id="stars-select" name="stars" [(ngModel)]="ratingFilter">
-                    <option [ngValue]="null">Stars</option>
-                    <option [ngValue]="1">1 Star</option>
-                    <option [ngValue]="2">2 Stars</option>
-                    <option [ngValue]="3">3 Stars</option>
-                    <option [ngValue]="4">4 Stars</option>
-                    <option [ngValue]="5">5 Stars</option>
-                </select>
-
-                <button type="submit" class="go-btn">Go</button>
+<section id="admin-users" class="main-viewport">
+    <div class="content-wrapper">
+        <header class="admin-header glass card">
+            <div class="header-top">
+                <h1 class="page-title">User Moderation</h1>
+                <span class="total-badge" [class.loading-badge]="isLoading()">
+                    {{ totalResults() }} Total Users
+                </span>
             </div>
 
-            <button type="button" class="sort-toggle" (click)="toggleSort()">
-                {{ sortDirection() === 'asc' ? 'A-Z' : 'Z-A' }}
-            </button>
-        </form>
-    </header>
-
-    <div id="users-feed" class="moderation-list">
-        @for (item of filteredItems(); track item._id) {
-            <article class="user-mod-card card">
-                <div class="user-info-section">
-                    <h3 class="full-name">{{ item.userId?.firstName }} {{ item.userId?.lastName }}</h3>
-                    <code class="user-email">{{ item.userId?.email }}</code>
-                    
-                    <div class="review-context">
-                        <span class="review-rating">{{ item.rating }} Star</span>
-                        <p class="review-text">"{{ item.comment }}"</p>
+            <form id="admin-filter-bar" (submit)="refresh(); $event.preventDefault()">
+                <div class="filter-group">
+                    <div class="input-wrapper">
+                        <i class="search-icon">🔍</i>
+                        <input type="text" id="user-filter" name="username" [(ngModel)]="usernameFilterInput"
+                            placeholder="Search Email or Name..." (ngModelChange)="refresh()" class="form-input">
                     </div>
-                </div>
 
-                <div class="action-grid">
-                    <button type="button" class="action-btn ban-btn" [class.active-ban]="item.userId?.isBanned" (click)="toggleBan(item.userId?._id)">
-                        {{ item.userId?.isBanned ? 'Unban' : 'Ban' }}
-                    </button>
-                    <button type="button" class="action-btn role-btn" (click)="toggleRole(item.userId?._id)">
-                        {{ item.userId?.role === 'admin' ? 'Demote' : 'Promote' }}
-                    </button>
-                    <button type="button" class="action-btn delete-btn" (click)="deleteUser(item.userId?._id)">
-                        Delete
-                    </button>
+                    <select id="stars-select" name="stars" [(ngModel)]="ratingFilterInput" (ngModelChange)="refresh()" class="form-input">
+                        <option [ngValue]="null">All Activity</option>
+                        <option [ngValue]="1">1 Star Reviews</option>
+                        <option [ngValue]="2">2 Star Reviews</option>
+                        <option [ngValue]="3">3 Star Reviews</option>
+                        <option [ngValue]="4">4 Star Reviews</option>
+                        <option [ngValue]="5">5 Star Reviews</option>
+                    </select>
                 </div>
-            </article>
-        } @empty {
-            <p class="empty-msg">No entries found matching your filters.</p>
-        }
+            </form>
+        </header>
+
+        <div id="users-feed" class="list-wrapper">
+            @if (totalResults() === 0) {
+            <div class="empty-msg glass card">
+                <p>No users found matching your filters.</p>
+            </div>
+            } @else {
+            <cdk-virtual-scroll-viewport itemSize="320" class="admin-viewport" (scrolledIndexChange)="onScroll($event)"
+                (scroll)="onRawScroll()">
+                <div *cdkVirtualFor="let item of dataSource; trackBy: trackById" class="admin-item-wrapper">
+                    @if (item) {
+                    <article class="user-mod-card card glass fade-in">
+                        <!-- Top Bar: Identity -->
+                        <div class="user-identity-header">
+                            <div class="id-left">
+                                <h3 class="full-name">{{ item.userId?.firstName }} {{ item.userId?.lastName }}</h3>
+                                <code class="user-email">{{ item.userId?.email }}</code>
+                            </div>
+                            <div class="id-right">
+                                <span class="user-role-badge" [class.admin-badge]="item.userId?.role === 'admin'">
+                                    {{ item.userId?.role }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Focused Center: Reviews -->
+                        <div class="focused-content">
+                            @if (item.reviews && item.reviews.length > 0) {
+                            <div class="reviews-list" appHorizontalScroll>
+                                @for (rev of item.reviews; track rev._id) {
+                                <div class="review-focus-item">
+                                    <div class="review-focus-top">
+                                        <div class="stars-focus">{{ rev.rating }} Stars</div>
+                                        <button type="button" class="mini-delete-btn" (click)="deleteReview(rev._id)">
+                                            Delete Review
+                                        </button>
+                                    </div>
+                                    @if (rev.comment) {
+                                    <blockquote class="focused-comment">{{ rev.comment }}</blockquote>
+                                    }
+                                    <div class="review-meta-focus">{{ rev.createdAt | date:'longDate' }}</div>
+                                </div>
+                                }
+                            </div>
+                            } @else {
+                            <div class="no-activity-center">
+                                <p>No recent reviews from this user.</p>
+                            </div>
+                            }
+                        </div>
+
+                        <!-- Bottom Bar: Bulk Actions -->
+                        <div class="user-action-footer">
+                            <button type="button" class="action-btn ban-btn" [class.active-ban]="item.userId?.isBanned"
+                                (click)="toggleBan(item.userId?._id)">
+                                {{ item.userId?.isBanned ? 'Unban User' : 'Ban User' }}
+                            </button>
+                            <button type="button" class="action-btn role-btn" (click)="toggleRole(item.userId?._id)">
+                                {{ item.userId?.role === 'admin' ? 'Demote to User' : 'Promote to Admin' }}
+                            </button>
+                            <button type="button" class="action-btn delete-btn" (click)="deleteUser(item.userId?._id)">
+                                Delete Account
+                            </button>
+                        </div>
+                    </article>
+                    } @else {
+                    <div class="admin-skeleton card glass">
+                        <div class="skeleton-header">
+                            <div class="skeleton-circle"></div>
+                            <div class="skeleton-line title"></div>
+                        </div>
+                        <div class="skeleton-line full"></div>
+                        <div class="skeleton-line partial"></div>
+                    </div>
+                    }
+                </div>
+            </cdk-virtual-scroll-viewport>
+            }
+        </div>
+
+        <footer class="admin-footer">
+            <button type="button" class="btn-secondary" routerLink="/home">Back to Dashboard</button>
+        </footer>
     </div>
-
-    <footer class="admin-footer">
-        <button type="button" class="secondary-btn" routerLink="/home">Back</button>
-    </footer>
 </section>

@@ -1,18 +1,10 @@
 <div class="search-results-wrapper">
-  @if (hotels.length > 0 || isLoading) {
-    <div class="results-header">
-      <h2 class="section-title">
-        @if (isLoading) {
-          Searching...
-        } @else {
-          Available Properties <span class="result-count">({{ hotels.length }})</span>
-        }
-      </h2>
-    </div>
-
-    <app-hotel-list 
-        [hotels]="hotels" 
-        [emptyMessage]="isLoading ? 'Finding the best hotels for you...' : 'No hotels found for your search. Try different filters!'">
-    </app-hotel-list>
-  }
+  <app-hotel-list 
+      [hotels]="hotels" 
+      [totalResults]="totalResults"
+      [emptyMessage]="isLoading ? 'Finding the best hotels for you...' : 'No hotels found for your search. Try different filters!'"
+      (nearEnd)="nearEnd.emit()"
+      (scrollIndexChange)="scrollIndexChange.emit($event)"
+      (scrollOffsetChange)="scrollOffsetChange.emit($event)">
+  </app-hotel-list>
 </div>
