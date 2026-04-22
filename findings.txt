@@ -1,0 +1,5 @@
+c:\Users\carte\OneDrive\Desktop\Code\School\WebDev\project\Hotel-Planner\.git\hooks\pre-push:5: echo "🚀 Vercel Watcher: Checking environment status..." (CHARS: ['🚀'])
+c:\Users\carte\OneDrive\Desktop\Code\School\WebDev\project\Hotel-Planner\frontend\src\app\pages\hotel-details\hotel-details.component.html:7: <button type="button" class="back-link-btn" (click)="goBack()">← Back</button> (CHARS: ['←'])
+c:\Users\carte\OneDrive\Desktop\Code\School\WebDev\project\Hotel-Planner\frontend\src\app\pages\login\login.component.html:14: <input type="password" id="login-password" name="password" class="form-input" required [(ngModel)]="password" placeholder="••••••••"> (CHARS: ['•', '•', '•', '•', '•', '•', '•', '•'])
+c:\Users\carte\OneDrive\Desktop\Code\School\WebDev\project\Hotel-Planner\frontend\src\app\pages\reviews\add-review.component.html:4: <button type="button" class="back-link-btn" (click)="cancel()">← Back to Hotel</button> (CHARS: ['←'])
+c:\Users\carte\OneDrive\Desktop\Code\School\WebDev\project\Hotel-Planner\frontend\src\app\pages\reviews\reviews.component.html:3: <button type="button" class="back-link-btn" (click)="goBack()">← Back</button> (CHARS: ['←'])

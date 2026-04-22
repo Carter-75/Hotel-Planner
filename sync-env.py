@@ -57,4 +57,3 @@ def sync_vercel_env():
 
 if __name__ == "__main__":
     sync_vercel_env()
-

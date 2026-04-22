@@ -1,59 +1,60 @@
 <section id="hotel-details-container">
     @if (isLoading()) {
-        <div class="loader">Loading hotel details...</div>
+    <div class="loader">Loading hotel details...</div>
     } @else if (hotel()) {
-        <div class="hotel-details-content">
-            <header class="details-header">
-                <button type="button" class="back-link-btn" (click)="goBack()">← Back</button>
-                <h1>{{ hotel().name }}</h1>
-                <p class="full-address">{{ hotel().address }}</p>
-            </header>
+    <div class="hotel-details-content">
+        <header class="details-header">
+            <button type="button" class="back-link-btn" (click)="goBack()">← Back</button>
+            <h1>{{ hotel().name }}</h1>
+            <p class="full-address">{{ hotel().address }}</p>
+        </header>
 
-            <div class="details-grid">
-                <div class="details-main card">
-                    <section class="info-section">
-                        <h2>Description</h2>
-                        <p>{{ hotel().description || 'No description available for this hotel yet.' }}</p>
-                    </section>
+        <div class="details-grid">
+            <div class="details-main card">
+                <section class="info-section">
+                    <h2>Description</h2>
+                    <p>{{ hotel().description || 'No description available for this hotel yet.' }}</p>
+                </section>
 
-                    <section class="amenities-section">
-                        <h2>Amenities</h2>
-                        <div class="amenities-grid">
-                            @for (item of hotel().amenities; track $index) {
-                                <div class="amenity-item">
-                                    <span class="dot"></span>
-                                    {{ item }}
-                                </div>
-                            }
+                <section class="amenities-section">
+                    <h2>Amenities</h2>
+                    <div class="amenities-grid">
+                        @for (item of hotel().amenities; track $index) {
+                        <div class="amenity-item">
+                            <span class="dot"></span>
+                            {{ item }}
                         </div>
-                    </section>
+                        }
+                    </div>
+                </section>
+            </div>
+
+            <aside class="details-sidebar card">
+                <div class="stat-row">
+                    <span class="label">Average Rating</span>
+                    <span class="value star-rating">{{ hotel().stars }} Stars</span>
+                </div>
+                <div class="stat-row">
+                    <span class="label">Price per night</span>
+                    <span class="value price-tag">${{ hotel().price }}</span>
                 </div>
 
-                <aside class="details-sidebar card">
-                    <div class="stat-row">
-                        <span class="label">Average Rating</span>
-                        <span class="value star-rating">{{ hotel().stars }} Stars</span>
-                    </div>
-                    <div class="stat-row">
-                        <span class="label">Price per night</span>
-                        <span class="value price-tag">${{ hotel().price }}</span>
-                    </div>
-
-                    <div class="details-actions">
-                        <button type="button" class="primary-btn" [routerLink]="['/reviews']" [queryParams]="{ hotelId: hotel()._id }">
-                            See Reviews
-                        </button>
-                        <button type="button" class="secondary-btn" [class.is-saved]="isSaved()" (click)="toggleSave()">
-                            {{ isSaved() ? 'Unsave Hotel' : 'Save Hotel' }}
-                        </button>
-                    </div>
-                </aside>
-            </div>
+                <div class="details-actions">
+                    <button type="button" class="primary-btn" [routerLink]="['/reviews']"
+                        [queryParams]="{ hotelId: hotel()._id }">
+                        See Reviews
+                    </button>
+                    <button type="button" class="secondary-btn" [class.is-saved]="isSaved()" (click)="toggleSave()">
+                        {{ isSaved() ? 'Unsave Hotel' : 'Save Hotel' }}
+                    </button>
+                </div>
+            </aside>
         </div>
+    </div>
     } @else {
-        <div class="error-msg">
-            <h2>Hotel not found</h2>
-            <button type="button" (click)="goBack()">Go Back</button>
-        </div>
+    <div class="error-msg">
+        <h2>Hotel not found</h2>
+        <button type="button" (click)="goBack()">Go Back</button>
+    </div>
     }
 </section>

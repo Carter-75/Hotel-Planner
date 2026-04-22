@@ -13,28 +13,28 @@
 
     <div id="reviews-list-container">
         @for (review of reviews(); track review._id) {
-            <article class="review-item card">
-                <div class="review-body">
-                    <div class="review-meta">
-                        <span class="user-name">{{ formatName(review.userId?.firstName, review.userId?.lastName) }}</span>
-                        <span class="star-rating">{{ review.rating }} Stars</span>
-                    </div>
-                    @if (review.comment) {
-                        <p class="review-comment">{{ review.comment }}</p>
-                    }
-                    <div class="review-footer">
-                        <small>{{ review.createdAt | date:'mediumDate' }}</small>
-                        
-                        @if (authService.isAdmin()) {
-                            <button type="button" class="btn-remove-review danger-link" (click)="removeReview(review._id)">
-                                Remove
-                            </button>
-                        }
-                    </div>
+        <article class="review-item card">
+            <div class="review-body">
+                <div class="review-meta">
+                    <span class="user-name">{{ formatName(review.userId?.firstName, review.userId?.lastName) }}</span>
+                    <span class="star-rating">{{ review.rating }} Stars</span>
                 </div>
-            </article>
+                @if (review.comment) {
+                <p class="review-comment">{{ review.comment }}</p>
+                }
+                <div class="review-footer">
+                    <small>{{ review.createdAt | date:'mediumDate' }}</small>
+
+                    @if (authService.isAdmin()) {
+                    <button type="button" class="btn-remove-review danger-link" (click)="removeReview(review._id)">
+                        Remove
+                    </button>
+                    }
+                </div>
+            </div>
+        </article>
         } @empty {
-            <p class="empty-msg">No reviews yet. Be the first to leave one!</p>
+        <p class="empty-msg">No reviews yet. Be the first to leave one!</p>
         }
     </div>
 </section>
