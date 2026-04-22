@@ -4,7 +4,7 @@
     {
       "src": "package.json",
       "use": "@vercel/static-build",
-      "config": { "distDir": "frontend/dist/frontend" }
+      "config": { "distDir": "frontend/dist/frontend/browser" }
     },
     {
       "src": "api/index.js",
@@ -18,7 +18,7 @@
     },
     {
       "source": "/(.*)",
-      "destination": "/$1"
+      "destination": "/index.html"
     }
   ]
 }
