@@ -84,20 +84,59 @@ app.get('/api/health', async (req, res) => {
 
 // --- MongoDB Setup ---
 const mongoURI = process.env.MONGODB_URI;
-if (mongoURI) {
-  console.log('INFO: Attempting to connect to MongoDB...');
-  mongoose.connect(mongoURI, {
-    serverSelectionTimeoutMS: 5000
-  })
-    .then(() => console.log('OK: Connected to MongoDB'))
-    .catch(err => {
-      console.error('ERROR: MongoDB Connection Failed:', err.message);
+
+const connectDB = async () => {
+  if (mongoose.connection.readyState >= 1) return;
+  
+  if (!mongoURI) {
+    console.warn('WARN: No MONGODB_URI found in environment!');
+    return;
+  }
+
+  try {
+    console.log('INFO: Connecting to MongoDB...');
+    await mongoose.connect(mongoURI, {
+      serverSelectionTimeoutMS: 5000,
+      connectTimeoutMS: 10000
     });
-} else {
-  console.warn('WARN: No MONGODB_URI found!');
-}
+    console.log('OK: Connected to MongoDB');
+  } catch (err) {
+    console.error('ERROR: MongoDB Connection Failed:', err.message);
+  }
+};
+
+// Initial connection
+connectDB();
 
 // --- Middlewares ---
+
+// Wait for DB middleware
+const dbCheck = async (req, res, next) => {
+  // If we are already connected, proceed
+  if (mongoose.connection.readyState === 1) return next();
+  
+  // If we aren't even trying to connect, try now
+  if (mongoose.connection.readyState === 0) {
+    await connectDB();
+  }
+  
+  // Wait up to 3 seconds for connection to stabilize
+  let attempts = 0;
+  const interval = setInterval(() => {
+    attempts++;
+    if (mongoose.connection.readyState === 1) {
+      clearInterval(interval);
+      return next();
+    }
+    if (attempts >= 30) { // 3 seconds
+      clearInterval(interval);
+      return res.status(503).json({ 
+        error: 'Database connection timeout. Please refresh or check MONGODB_URI.' 
+      });
+    }
+  }, 100);
+};
+
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -111,6 +150,9 @@ app.use((req, res, next) => {
   res.setHeader('X-Frame-Options', 'ALLOWALL');
   next();
 });
+
+// Apply DB check to all /api routes
+app.use('/api', dbCheck);
 
 app.use(cors({
   origin: true,
