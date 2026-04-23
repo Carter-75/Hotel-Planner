@@ -30,5 +30,5 @@ export const routes: Routes = [
   { path: 'add-review', component: AddReviewComponent, canActivate: [authGuard] },
   { path: 'banned', component: BannedComponent },
   { path: '', canActivate: [rootGuard], component: LoginComponent }, // Entry point
-  { path: '**', redirectTo: '/login' }
+  { path: '**', redirectTo: '' }
 ];
