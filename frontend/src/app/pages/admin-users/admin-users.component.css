@@ -216,10 +216,28 @@ select.form-input {
 
 .review-focus-top {
     display: flex;
+    flex-direction: column; /* Stack hotel name above stars/delete */
     justify-content: center;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
     margin-bottom: 8px;
+}
+
+.review-hotel-info {
+    margin-bottom: 4px;
+}
+
+.hotel-link {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--primary);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.hotel-link:hover {
+    color: var(--secondary);
+    text-decoration: underline;
 }
 
 .stars-focus {

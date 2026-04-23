@@ -59,6 +59,11 @@
                                 @for (rev of item.reviews; track rev._id) {
                                 <div class="review-focus-item">
                                     <div class="review-focus-top">
+                                        <div class="review-hotel-info">
+                                            <a [routerLink]="['/hotel-details', rev.hotelId?._id]" class="hotel-link">
+                                                {{ rev.hotelId?.name || 'Unknown Hotel' }}
+                                            </a>
+                                        </div>
                                         <div class="stars-focus">{{ rev.rating }} Stars</div>
                                         <button type="button" class="mini-delete-btn" (click)="deleteReview(rev._id)">
                                             Delete Review

@@ -21,6 +21,7 @@ router.get('/users', isAdmin, async (req, res) => {
 
     // 2. Fetch all reviews
     const allReviews = await Review.find({})
+      .populate('hotelId', 'name')
       .sort({ createdAt: -1 })
       .lean();
 
