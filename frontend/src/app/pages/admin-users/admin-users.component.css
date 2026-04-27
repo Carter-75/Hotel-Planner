@@ -8,7 +8,7 @@
     overflow: hidden;
     box-sizing: border-box;
     background: radial-gradient(circle at top right, rgba(79, 70, 229, 0.03), transparent),
-                radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.03), transparent);
+        radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.03), transparent);
 }
 
 .content-wrapper {
@@ -75,12 +75,14 @@
     color: var(--text-muted);
 }
 
-input.form-input, select.form-input {
+input.form-input,
+select.form-input {
     width: 100%;
     padding: 12px 16px 12px 48px;
     border-radius: 14px;
-    border: 1px solid rgba(0,0,0,0.08);
+    border: 1px solid rgba(0, 0, 0, 0.08);
     background: white;
+    color: var(--text-main);
     font-size: 1rem;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -96,6 +98,8 @@ select.form-input {
     flex-direction: column;
     min-height: 0;
     margin-bottom: 24px;
+    position: relative; /* Anchor for custom scrollbar */
+    overflow: visible !important; /* Allow scrollbar to be outside */
 }
 
 .admin-viewport {
@@ -107,11 +111,52 @@ select.form-input {
     scrollbar-width: none;
 }
 
-.admin-viewport::-webkit-scrollbar { display: none; }
+.admin-viewport::-webkit-scrollbar {
+    display: none;
+}
+
+.admin-viewport.no-snap {
+    scroll-snap-type: none !important;
+}
+
+.custom-scrollbar-container {
+    position: absolute;
+    right: -17.5px; /* Moved outside the data area */
+    top: 0;
+    bottom: 0;
+    width: 8px;
+    z-index: 1000;
+    pointer-events: none;
+    background: rgba(0,0,0,0.03);
+    border-radius: 10px;
+}
+
+.scrollbar-thumb {
+    width: 100%;
+    background: rgba(79, 70, 229, 0.4);
+    border-radius: 10px;
+    pointer-events: all;
+    cursor: grab;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255,255,255,0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: background 0.2s, width 0.1s;
+}
+
+.scrollbar-thumb:hover,
+.scrollbar-thumb:active {
+    background: var(--primary);
+    width: 10px;
+    right: 4px;
+}
+
+.scrollbar-thumb:active {
+    cursor: grabbing;
+}
 
 .admin-item-wrapper {
     padding: 8px 0;
-    height: 320px;
+    height: 370px;
     box-sizing: border-box;
     /* Force snap point at the very start of every item wrapper */
     scroll-snap-align: start !important;
@@ -123,7 +168,7 @@ select.form-input {
 .user-mod-card {
     display: flex;
     flex-direction: column;
-    height: 304px;
+    height: 354px;
     padding: 16px 20px;
     border-radius: 20px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -141,7 +186,7 @@ select.form-input {
     justify-content: space-between;
     align-items: center;
     padding-bottom: 12px;
-    border-bottom: 1px solid rgba(0,0,0,0.05);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .id-left .full-name {
@@ -186,7 +231,7 @@ select.form-input {
 
 .reviews-list {
     width: 100%;
-    max-height: 150px;
+    max-height: 220px;
     display: flex;
     flex-direction: row;
     overflow-x: auto !important;
@@ -198,12 +243,22 @@ select.form-input {
 }
 
 /* Custom Scrollbar for Horizontal */
-.reviews-list::-webkit-scrollbar { height: 6px; }
-.reviews-list::-webkit-scrollbar-track { background: transparent; }
-.reviews-list::-webkit-scrollbar-thumb { background: rgba(79, 70, 229, 0.1); border-radius: 10px; }
+.reviews-list::-webkit-scrollbar {
+    height: 6px;
+}
+
+.reviews-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.reviews-list::-webkit-scrollbar-thumb {
+    background: rgba(79, 70, 229, 0.1);
+    border-radius: 10px;
+}
 
 .review-focus-item {
-    flex: 0 0 100%; /* Each review takes full width of card */
+    flex: 0 0 100%;
+    /* Each review takes full width of card */
     min-height: 120px;
     scroll-snap-align: start;
     scroll-snap-stop: always;
@@ -216,7 +271,8 @@ select.form-input {
 
 .review-focus-top {
     display: flex;
-    flex-direction: column; /* Stack hotel name above stars/delete */
+    flex-direction: column;
+    /* Stack hotel name above stars/delete */
     justify-content: center;
     align-items: center;
     gap: 8px;
@@ -294,7 +350,7 @@ select.form-input {
     display: flex;
     gap: 8px;
     padding-top: 12px;
-    border-top: 1px solid rgba(0,0,0,0.05);
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
     justify-content: center;
 }
 
@@ -308,15 +364,47 @@ select.form-input {
     cursor: pointer;
 }
 
-.ban-btn { background: #fff1f2; color: #e11d48; border-color: #fecdd3; }
-.ban-btn:hover { background: #e11d48; color: white; transform: translateY(-2px); }
-.ban-btn.active-ban { background: #e11d48; color: white; }
+.ban-btn {
+    background: #fff1f2;
+    color: #e11d48;
+    border-color: #fecdd3;
+}
 
-.role-btn { background: #f0f9ff; color: #0369a1; border-color: #bae6fd; }
-.role-btn:hover { background: #0369a1; color: white; transform: translateY(-2px); }
+.ban-btn:hover {
+    background: #e11d48;
+    color: white;
+    transform: translateY(-2px);
+}
 
-.delete-btn { background: white; color: #64748b; border-color: #e2e8f0; }
-.delete-btn:hover { background: #f8fafc; color: #ef4444; border-color: #ef4444; transform: translateY(-2px); }
+.ban-btn.active-ban {
+    background: #e11d48;
+    color: white;
+}
+
+.role-btn {
+    background: #f0f9ff;
+    color: #0369a1;
+    border-color: #bae6fd;
+}
+
+.role-btn:hover {
+    background: #0369a1;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.delete-btn {
+    background: white;
+    color: #64748b;
+    border-color: #e2e8f0;
+}
+
+.delete-btn:hover {
+    background: #f8fafc;
+    color: #ef4444;
+    border-color: #ef4444;
+    transform: translateY(-2px);
+}
 
 .admin-footer {
     display: flex;
@@ -343,12 +431,31 @@ select.form-input {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.98) translateY(20px); }
-    to { opacity: 1; transform: scale(1) translateY(0); }
+    from {
+        opacity: 0;
+        transform: scale(0.98) translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
 }
 
 /* Custom Scrollbar */
-.reviews-list::-webkit-scrollbar { width: 5px; }
-.reviews-list::-webkit-scrollbar-track { background: transparent; }
-.reviews-list::-webkit-scrollbar-thumb { background: rgba(79, 70, 229, 0.1); border-radius: 10px; }
-.reviews-list:hover::-webkit-scrollbar-thumb { background: rgba(79, 70, 229, 0.2); }
+.reviews-list::-webkit-scrollbar {
+    width: 5px;
+}
+
+.reviews-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.reviews-list::-webkit-scrollbar-thumb {
+    background: rgba(79, 70, 229, 0.1);
+    border-radius: 10px;
+}
+
+.reviews-list:hover::-webkit-scrollbar-thumb {
+    background: rgba(79, 70, 229, 0.2);
+}

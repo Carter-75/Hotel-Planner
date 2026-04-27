@@ -2,7 +2,7 @@
     <div class="review-page-container">
         <header class="review-header">
             <button type="button" class="back-link-btn" (click)="cancel()">← Back to Hotel</button>
-            <h1 class="page-title">Share Your Experience</h1>
+            <h1 class="page-title">{{ reviewId() ? 'Edit Your Review' : 'Share Your Experience' }}</h1>
             <p class="hotel-sub">Reviewing <strong>{{ hotelName() }}</strong></p>
         </header>
 
@@ -30,7 +30,7 @@
 
             <div class="form-actions">
                 <button type="button" class="btn-secondary" (click)="cancel()">Discard</button>
-                <button type="submit" class="btn-primary">Post Review</button>
+                <button type="submit" class="btn-primary">{{ reviewId() ? 'Save Changes' : 'Post Review' }}</button>
             </div>
         </form>
     </div>

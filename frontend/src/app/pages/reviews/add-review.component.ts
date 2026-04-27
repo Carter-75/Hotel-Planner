@@ -21,6 +21,7 @@ export class AddReviewComponent implements OnInit {
   
   // Banana in a box model using signals
   hotelId = signal('');
+  reviewId = signal('');
   hotelName = signal('Loading...');
   rating = signal(5);
   comment = signal('');
@@ -28,9 +29,25 @@ export class AddReviewComponent implements OnInit {
   ngOnInit() {
     this.route.queryParams.subscribe((params: any) => {
       this.hotelId.set(params['hotelId']);
+      this.reviewId.set(params['reviewId']);
+
       if (this.hotelId()) {
         this.loadHotelDetails();
       }
+
+      if (this.reviewId()) {
+        this.loadReviewDetails();
+      }
+    });
+  }
+
+  loadReviewDetails() {
+    this.apiService.getReview(this.reviewId()).subscribe({
+      next: (review: any) => {
+        this.rating.set(review.rating);
+        this.comment.set(review.comment || '');
+      },
+      error: (err: any) => console.error('Failed to load review:', err)
     });
   }
 
@@ -54,21 +71,33 @@ export class AddReviewComponent implements OnInit {
 
     const reviewData = {
       hotelId: this.hotelId(),
-      rating: Number(this.rating()), // Ensure numeric
+      rating: Number(this.rating()), //Ensure numeric
       comment: (this.comment() || '').trim()
     };
 
-    this.apiService.postData('reviews', reviewData).subscribe({
-      next: () => {
-        // Sync local state since backend auto-saved this hotel
-        this.authService.forceSaveLocal(this.hotelId());
-        this.location.back();
-      },
-      error: (err: any) => {
-        console.error('Review submission failed:', err);
-        alert(err.error?.error || 'Failed to submit review. Please ensure you are logged in.');
-      }
-    });
+    if (this.reviewId()) {
+      // Edit mode
+      this.apiService.updateReview(this.reviewId(), reviewData).subscribe({
+        next: () => this.location.back(),
+        error: (err: any) => {
+          console.error('Review update failed:', err);
+          alert(err.error?.error || 'Failed to update review.');
+        }
+      });
+    } else {
+      // Create mode
+      this.apiService.postData('reviews', reviewData).subscribe({
+        next: () => {
+          // Sync local state since backend auto-saved this hotel
+          this.authService.forceSaveLocal(this.hotelId());
+          this.location.back();
+        },
+        error: (err: any) => {
+          console.error('Review submission failed:', err);
+          alert(err.error?.error || 'Failed to submit review. Please ensure you are logged in.');
+        }
+      });
+    }
   }
 
   cancel() {

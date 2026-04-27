@@ -65,7 +65,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
   }
 
   ngAfterViewInit() {
-    this.restoreScroll(5); // Attempt restoration with 5 retries
+    this.restoreScroll(5); //Attempt restoration with 5 retries
   }
 
   private restoreScroll(retries: number) {

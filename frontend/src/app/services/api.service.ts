@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 export class ApiService {
   private http = inject(HttpClient);
   
-  // Picks the right API URL based on where we are (local vs prod)
+  //Picks the right API URL based on where we are (local vs prod)
   private get apiUrl(): string {
     const isProd = ('__PRODUCTION__' as string) === 'true';
     const prodBackend = '__PROD_BACKEND_URL__' as string;
@@ -63,53 +63,63 @@ export class ApiService {
     return this.http.delete<T>(`${this.apiUrl}/${endpoint}`, { withCredentials: true });
   }
 
-  // Get hotels using filters with pagination support
+  //Get hotels using filters with pagination support
   getHotels(filters: any): Observable<any> {
     return this.getData<any>('hotels', filters);
   }
 
-  // Get just one hotel by its ID
+  //Get just one hotel by its ID
   getHotel(id: string): Observable<any> {
     return this.getData<any>(`hotels/${id}`);
   }
 
-  // Fetch all reviews for a specific hotel
+  //Fetch all reviews for a specific hotel
   getReviews(hotelId: string): Observable<any[]> {
-    return this.getData<any[]>(`reviews/hotel/${hotelId}`);
+    return this.getData<any[]>(`hotels/${hotelId}/reviews`);
   }
 
-  // Save or unsave a hotel for the logged-in user
+  //Save or unsave a hotel for the logged-in user
   toggleSaveHotel(hotelId: string): Observable<string[]> {
-    return this.postData<string[]>(`user/save-hotel/${hotelId}`, {});
+    return this.postData<string[]>(`user/saved-hotels/${hotelId}`, {});
   }
 
-  // Get the current user's list of saved hotels
+  //Get the current user's list of saved hotels
   getSavedHotels(): Observable<any[]> {
     return this.getData<any[]>('user/saved-hotels');
   }
 
-  // Admin: Get a list of all users on the platform with pagination and filters
+  //Admin: Get a list of all users on the platform with pagination and filters
   getAllUsers(params?: any): Observable<any> {
     return this.getData<any>('admin/users', params);
   }
 
-  // Admin: Change a user's role (User <-> Admin)
+  //Admin: Change a user's role (User <-> Admin)
   updateUserRole(userId: string): Observable<any> {
     return this.http.patch<any>(`${this.apiUrl}/admin/users/${userId}/role`, {}, { withCredentials: true });
   }
 
-  // Admin: Ban or unban a specific user
+  //Admin: Ban or unban a specific user
   toggleUserBan(userId: string): Observable<any> {
     return this.http.patch<any>(`${this.apiUrl}/admin/users/${userId}/ban`, {}, { withCredentials: true });
   }
 
-  // Admin: Completely remove a user from the database
+  //Admin: Completely remove a user from the database
   deleteUser(userId: string): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/admin/users/${userId}`, { withCredentials: true });
   }
 
-  // Admin: Remove a specific review
+  //Admin: Remove a specific review
   deleteReview(reviewId: string): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/reviews/${reviewId}`, { withCredentials: true });
+  }
+
+  //Fetch a single review by its ID
+  getReview(reviewId: string): Observable<any> {
+    return this.getData<any>(`reviews/${reviewId}`);
+  }
+
+  //Update an existing review
+  updateReview(reviewId: string, data: any): Observable<any> {
+    return this.putData<any>(`reviews/${reviewId}`, data);
   }
 }

@@ -22,17 +22,18 @@ export class AdminUsersComponent implements OnInit, AfterViewInit {
   public authService = inject(AuthService);
   private state = inject(AdminStateService);
   private _destroy$ = new Subject<void>();
-  
+
   @ViewChild(CdkVirtualScrollViewport) viewport?: CdkVirtualScrollViewport;
 
-  // View Signals linked to State Service
+  //View Signals linked to State Service
   items = this.state.items;
   isLoading = signal(false);
-  
-  // Local form inputs for two-way binding
+
+  //Local form inputs for two-way binding
   usernameFilterInput = this.state.usernameFilter();
   ratingFilterInput = this.state.ratingFilter();
-  
+  sortInput = this.state.sortOrder();
+
   currentPage = this.state.currentPage;
   totalResults = this.state.totalResults;
   hasMore = this.state.hasMore;
@@ -40,24 +41,28 @@ export class AdminUsersComponent implements OnInit, AfterViewInit {
   dataSource!: UserDataSource;
 
   ngOnInit() {
-    // Force fresh data on every navigation to this page
+    //Force fresh data on every navigation to this page
     if (!this.state.dataSource) {
       this.state.dataSource = new UserDataSource(this.apiService);
     }
-    
-    this.dataSource = this.state.dataSource;
-    this.refresh(); // Ensure we don't show stale cached data from previous visit
 
-    // Sync total results for empty state message
+    this.dataSource = this.state.dataSource;
+    this.refresh(); //Ensure we don't show stale cached data from previous visit
+
+    //Sync total results for empty state message
     this.dataSource.totalResults$
       .pipe(takeUntil(this._destroy$))
-      .subscribe(total => this.totalResults.set(total));
+      .subscribe(total => {
+        this.totalResults.set(total);
+        setTimeout(() => this.updateThumbPosition(), 100);
+      });
   }
 
   private updateDataSource() {
     this.dataSource.updateFilters({
       search: this.state.usernameFilter(),
-      rating: this.state.ratingFilter()
+      rating: this.state.ratingFilter(),
+      sort: this.state.sortOrder()
     });
   }
 
@@ -82,28 +87,89 @@ export class AdminUsersComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // Restart from page 1
+  //Restart from page 1
   refresh() {
     this.state.usernameFilter.set(this.usernameFilterInput);
     this.state.ratingFilter.set(this.ratingFilterInput);
+    this.state.sortOrder.set(this.sortInput);
     this.updateDataSource();
   }
 
-  // LoadMore is now handled by UserDataSource
+  //LoadMore is now handled by UserDataSource
   loadMore() { }
 
   private performLoad(append: boolean) { }
 
-  // Handle scrolling in the virtual viewport
+  //Scrollbar properties
+  isDragging = false;
+  thumbTop = 0;
+  thumbHeight = 50;
+  private _dragStartY = 0;
+  private _dragStartScroll = 0;
+
+  //Handle scrolling in the virtual viewport
   onScroll(index: number) {
-    // Save index in real-time
+    //Save index in real-time
     this.state.scrollIndex.set(index);
   }
 
   onRawScroll() {
     if (this.viewport) {
       this.state.scrollOffset.set(this.viewport.measureScrollOffset());
+      this.updateThumbPosition();
     }
+  }
+
+  private updateThumbPosition() {
+    if (!this.viewport) return;
+
+    const offset = this.viewport.measureScrollOffset();
+    const totalHeight = this.dataSource.totalLength * 370; // itemSize
+    const viewportHeight = this.viewport.getViewportSize();
+
+    if (totalHeight <= viewportHeight) {
+      this.thumbHeight = 0;
+      return;
+    }
+
+    const ratio = viewportHeight / totalHeight;
+    this.thumbHeight = Math.max(viewportHeight * ratio, 40);
+
+    const maxScroll = totalHeight - viewportHeight;
+    const scrollRatio = offset / maxScroll;
+    const maxThumbTop = viewportHeight - this.thumbHeight - 20; // 10px top/bottom padding
+    this.thumbTop = scrollRatio * maxThumbTop;
+  }
+
+  startDrag(event: MouseEvent) {
+    event.preventDefault();
+    this.isDragging = true;
+    this._dragStartY = event.clientY;
+    this._dragStartScroll = this.viewport?.measureScrollOffset() || 0;
+
+    const onMouseMove = (moveEvent: MouseEvent) => {
+      if (!this.isDragging || !this.viewport) return;
+
+      const deltaY = moveEvent.clientY - this._dragStartY;
+      const viewportHeight = this.viewport.getViewportSize();
+      const totalHeight = this.dataSource.totalLength * 370;
+      const maxScroll = totalHeight - viewportHeight;
+      const maxThumbTop = viewportHeight - this.thumbHeight - 20;
+
+      const scrollRatio = deltaY / maxThumbTop;
+      const scrollDelta = scrollRatio * maxScroll;
+
+      this.viewport.scrollToOffset(this._dragStartScroll + scrollDelta);
+    };
+
+    const onMouseUp = () => {
+      this.isDragging = false;
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+
+    document.addEventListener('mousemove', onMouseMove, { passive: true });
+    document.addEventListener('mouseup', onMouseUp, { passive: true });
   }
 
   fastScrollToOffset(targetOffset: number, duration: number = 300) {
@@ -116,7 +182,7 @@ export class AdminUsersComponent implements OnInit, AfterViewInit {
     const animate = (currentTime: number) => {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      
+
       const easeOut = 1 - Math.pow(1 - progress, 3);
       this.viewport?.scrollToOffset(startOffset + distance * easeOut);
 
@@ -128,7 +194,7 @@ export class AdminUsersComponent implements OnInit, AfterViewInit {
     requestAnimationFrame(animate);
   }
 
-  // Administrative actions
+  //Administrative actions
   toggleRole(userId: string) {
     this.apiService.updateUserRole(userId).subscribe({
       next: () => this.dataSource.refreshPage(this.state.scrollIndex()),
@@ -156,7 +222,7 @@ export class AdminUsersComponent implements OnInit, AfterViewInit {
     if (confirm('Are you sure you want to delete this review? This action cannot be undone.')) {
       this.apiService.deleteReview(reviewId).subscribe({
         next: () => {
-          // Refresh the current view to show the review is gone
+          //Refresh the current view to show the review is gone
           this.dataSource.refreshPage(this.state.scrollIndex());
         },
         error: (err: any) => alert(err.error?.error || 'Failed to delete review')

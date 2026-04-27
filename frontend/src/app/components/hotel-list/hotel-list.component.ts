@@ -45,9 +45,10 @@ import { HotelCardComponent } from '../hotel-card/hotel-card.component';
       flex-direction: column;
     }
     .hotel-viewport {
+      flex: 1;
       height: 100%; 
       width: 100%;
-      min-height: 400px;
+      min-height: 600px;
     }
     /* Hide scrollbar but allow scrolling for a seamless feel */
     .hotel-viewport::-webkit-scrollbar {
@@ -141,7 +142,7 @@ export class HotelListComponent {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
       
-      // Power-out easing: starts fast, slows down at the end
+      //Power-out easing: starts fast, slows down at the end
       const easeOut = 1 - Math.pow(1 - progress, 3);
       
       this.viewport?.scrollToOffset(startOffset + distance * easeOut);

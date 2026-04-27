@@ -86,7 +86,7 @@ app.get('/api/health', async (req, res) => {
 // --- MongoDB Setup ---
 const mongoURI = process.env.MONGODB_URI;
 
-// Global caching for Mongoose to prevent connection exhaustion on Vercel
+//Global caching for Mongoose to prevent connection exhaustion in serverless or multi-instance environments
 let cached = global.mongoose;
 if (!cached) {
   cached = global.mongoose = { conn: null, promise: null };
@@ -94,7 +94,7 @@ if (!cached) {
 
 const connectDB = async () => {
   if (cached.conn) return cached.conn;
-  
+
   if (!mongoURI) {
     console.warn('WARN: No MONGODB_URI found in environment!');
     return null;
@@ -103,7 +103,7 @@ const connectDB = async () => {
   if (!cached.promise) {
     const opts = {
       bufferCommands: false,
-      maxPoolSize: 5, // Small pool for serverless
+      maxPoolSize: 5, //Small pool for limited-resource environments
       serverSelectionTimeoutMS: 5000,
       connectTimeoutMS: 10000
     };
@@ -124,22 +124,22 @@ const connectDB = async () => {
   return cached.conn;
 };
 
-// Initial connection call
+//Initial connection call
 connectDB();
 
 // --- Middlewares ---
 
-// Wait for DB middleware
+//Wait for DB middleware
 const dbCheck = async (req, res, next) => {
-  // If we are already connected, proceed
+  //If we are already connected, proceed
   if (mongoose.connection.readyState === 1) return next();
-  
-  // If we aren't even trying to connect, try now
+
+  //If we aren't even trying to connect, try now
   if (mongoose.connection.readyState === 0) {
     await connectDB();
   }
-  
-  // Wait up to 3 seconds for connection to stabilize
+
+  //Wait up to 3 seconds for connection to stabilize
   let attempts = 0;
   const interval = setInterval(() => {
     attempts++;
@@ -149,8 +149,8 @@ const dbCheck = async (req, res, next) => {
     }
     if (attempts >= 30) { // 3 seconds
       clearInterval(interval);
-      return res.status(503).json({ 
-        error: 'Database connection timeout. Please refresh or check MONGODB_URI.' 
+      return res.status(503).json({
+        error: 'Database connection timeout. Please refresh or check MONGODB_URI.'
       });
     }
   }, 100);
@@ -175,7 +175,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-// Sessions
+//Sessions
 const sessionConfig = {
   secret: process.env.SESSION_SECRET || 'secret',
   resave: false,
@@ -192,23 +192,20 @@ if (process.env.MONGODB_URI) {
     mongoUrl: process.env.MONGODB_URI,
     collectionName: 'sessions',
     ttl: 14 * 24 * 60 * 60, // 14 days
-    // Use the same connection options to ensure stability
     mongoOptions: {
       maxPoolSize: 5,
       serverSelectionTimeoutMS: 5000
     }
   });
-} else {
-  console.warn('WARN: MONGODB_URI missing. Sessions will be volatile (MemoryStore).');
 }
 
 app.use(session(sessionConfig));
 
-// Passport
+//Passport
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Apply DB check to all /api routes
+//Apply DB check to all /api routes
 app.use('/api', dbCheck);
 
 app.use(cors({
@@ -216,10 +213,9 @@ app.use(cors({
   credentials: true
 }));
 
+app.use(express.static(path.join(__dirname, 'public')));
+
 // --- Routes ---
-app.get('/', (req, res) => {
-  res.send('API for ' + PROJECT_NAME + ' is running at /api');
-});
 
 app.use('/api', indexRouter);
 app.use('/api/auth', authRouter);
@@ -228,8 +224,10 @@ app.use('/api/reviews', reviewRouter);
 app.use('/api/user', userActionsRouter);
 app.use('/api/admin', adminRouter);
 
-
-
+//serve index.html for any non-API routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 // Error handler
 app.use((err, req, res, next) => {

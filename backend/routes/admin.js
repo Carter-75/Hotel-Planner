@@ -12,20 +12,21 @@ const { isAdmin } = require('../middleware/auth');
  */
 router.get('/users', isAdmin, async (req, res) => {
   try {
-    const { page = 1, limit = 20, search = '', rating = null } = req.query;
+    const { page = 1, limit = 20, search = '', rating = null, sort = 'newest' } = req.query;
+    console.log(`[AdminAPI] Fetching users with sort: ${sort}`);
     
-    // 1. Fetch all users
+    //1. Fetch all users
     const users = await User.find({})
       .select('firstName lastName email role isBanned createdAt')
       .lean();
 
-    // 2. Fetch all reviews
+    //2. Fetch all reviews
     const allReviews = await Review.find({})
       .populate('hotelId', 'name')
       .sort({ createdAt: -1 })
       .lean();
 
-    // 3. Group reviews by User ID
+    //3. Group reviews by User ID
     const reviewMap = new Map();
     allReviews.forEach(r => {
       const uid = r.userId?.toString();
@@ -34,7 +35,7 @@ router.get('/users', isAdmin, async (req, res) => {
       reviewMap.get(uid).push(r);
     });
 
-    // 4. Map users to their reviews and calculate 'latest activity'
+    //4. Map users to their reviews and calculate 'latest activity'
     let combined = users.map(u => {
       const userReviews = reviewMap.get(u._id.toString()) || [];
       const latestReviewDate = userReviews.length > 0 ? userReviews[0].createdAt : null;
@@ -45,12 +46,12 @@ router.get('/users', isAdmin, async (req, res) => {
         userId: u,
         reviews: userReviews,
         latestActivity,
-        // For compatibility with search filters
+        //For compatibility with search filters
         rating: userReviews.length > 0 ? userReviews[0].rating : null
       };
     });
 
-    // 5. Apply server-side filters
+    //5. Apply server-side filters
     if (search) {
       const s = search.toLowerCase();
       combined = combined.filter(item => {
@@ -61,18 +62,36 @@ router.get('/users', isAdmin, async (req, res) => {
     }
 
     if (rating) {
-      // Filter for users who have at least one review with this specific rating
+      //Filter for users who have at least one review with this specific rating
       combined = combined.filter(item => 
         item.reviews.some(r => r.rating === Number(rating))
       );
     }
 
-    // 6. Sort by newest activity first
-    combined.sort((a, b) => {
-      return new Date(b.latestActivity).getTime() - new Date(a.latestActivity).getTime();
-    });
+    //6. Apply Sorting
+    if (sort === 'az') {
+      console.log('[AdminAPI] Sorting A-Z...');
+      combined.sort((a, b) => {
+        const nameA = `${a.userId.firstName} ${a.userId.lastName}`.toLowerCase();
+        const nameB = `${b.userId.firstName} ${b.userId.lastName}`.toLowerCase();
+        return nameA.localeCompare(nameB);
+      });
+    } else if (sort === 'za') {
+      console.log('[AdminAPI] Sorting Z-A...');
+      combined.sort((a, b) => {
+        const nameA = `${a.userId.firstName} ${a.userId.lastName}`.toLowerCase();
+        const nameB = `${b.userId.firstName} ${b.userId.lastName}`.toLowerCase();
+        return nameB.localeCompare(nameA);
+      });
+    } else {
+      //Default: Sort by newest activity first
+      console.log('[AdminAPI] Sorting by newest activity...');
+      combined.sort((a, b) => {
+        return new Date(b.latestActivity).getTime() - new Date(a.latestActivity).getTime();
+      });
+    }
 
-    // 7. Paginate
+    //7. Paginate
     const startIndex = (Number(page) - 1) * Number(limit);
     const paginatedItems = combined.slice(startIndex, startIndex + Number(limit));
 
@@ -165,11 +184,11 @@ router.delete('/users/:id', isAdmin, async (req, res) => {
 });
 
 /**
- * @route   POST /api/admin/seed-bulk
+ * @route   POST /api/admin/hotels/seed
  * @desc    Bulk seed hotels (Admin Only)
  * @access  Private (Admin Only)
  */
-router.post('/seed-bulk', isAdmin, async (req, res) => {
+router.post('/hotels/seed', isAdmin, async (req, res) => {
   try {
     const { hotels, clearExisting } = req.body;
 

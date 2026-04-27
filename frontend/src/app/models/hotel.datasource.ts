@@ -12,10 +12,10 @@ export class HotelDataSource extends DataSource<any | undefined> {
   private _subscription = new Subscription();
   private _destroy$ = new Subject<void>();
   
-  // Public stream for components to watch the total count
+  //pblic stream for components to watch the total count
   public totalResults$ = new BehaviorSubject<number>(0);
 
-  // Current filter state
+  //current filter state
   private _filters: any = {};
 
   get totalLength(): number {
@@ -30,7 +30,7 @@ export class HotelDataSource extends DataSource<any | undefined> {
    * Sets new filters and resets the cache
    */
   updateFilters(filters: any) {
-    // Clean filters: remove null, undefined, or empty strings
+    //Clean filters: remove null, undefined, or empty strings
     this._filters = Object.keys(filters).reduce((acc: any, key) => {
       const val = filters[key];
       if (val !== null && val !== undefined && val !== '') {
@@ -44,8 +44,7 @@ export class HotelDataSource extends DataSource<any | undefined> {
     this._length = 0;
     this._dataStream.next([]);
     
-    // Bootstrap: Fetch the first page immediately to get total results
-    // This allows the viewport to realize how big the list is
+    //Bootstrap: Fetch the first page immediately to get total results to allow the viewport to realize how big the list is
     this._fetchPage(0);
   }
 
@@ -59,7 +58,7 @@ export class HotelDataSource extends DataSource<any | undefined> {
           this._fetchPage(i);
         }
 
-        // Proactively unload pages that are far away (buffer of 3 pages)
+        //Proactively unload pages that are far away (buffer of 3 pages)
         this._cleanupCache(startPage, endPage);
       })
     );
@@ -67,9 +66,7 @@ export class HotelDataSource extends DataSource<any | undefined> {
   }
 
   disconnect(): void {
-    // We only unsubscribe the internal connection listeners, 
-    // but WE DO NOT complete the subjects because this DataSource is a singleton
-    // that survives multiple connect/disconnect cycles.
+    //unsubscribe 
     this._subscription.unsubscribe();
     this._subscription = new Subscription();
   }
@@ -93,12 +90,12 @@ export class HotelDataSource extends DataSource<any | undefined> {
       this._length = res.total;
       this.totalResults$.next(res.total);
       
-      // Update our sparse representation
+      //Update our sparse representation
       const pageData = res.hotels;
       this._cachedData.set(pageIndex, pageData);
 
-      // Construct a full array for the stream (filled with undefined for missing parts)
-      // This tells CDK exactly how long the list is
+      //Construct a full array for the stream (filled with undefined for missing parts)
+      //This tells cdk exactly how long the list is
       this._updateDataStream();
     });
   }
@@ -123,6 +120,5 @@ export class HotelDataSource extends DataSource<any | undefined> {
         this._fetchedPages.delete(pageIndex);
       }
     });
-    // We don't always need to push to stream here unless we want to show skeletons immediately
   }
 }

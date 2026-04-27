@@ -30,6 +30,14 @@
                         Remove
                     </button>
                     }
+
+                    @if (authService.currentUser()?._id === review.userId?._id) {
+                    <button type="button" class="btn-edit-review secondary-link" 
+                        [routerLink]="['/add-review']" 
+                        [queryParams]="{ hotelId: hotelId(), reviewId: review._id }">
+                        Edit
+                    </button>
+                    }
                 </div>
             </div>
         </article>

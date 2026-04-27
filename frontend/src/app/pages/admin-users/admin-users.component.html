@@ -16,7 +16,8 @@
                             placeholder="Search Email or Name..." (ngModelChange)="refresh()" class="form-input">
                     </div>
 
-                    <select id="stars-select" name="stars" [(ngModel)]="ratingFilterInput" (ngModelChange)="refresh()" class="form-input">
+                    <select id="stars-select" name="stars" [(ngModel)]="ratingFilterInput" (ngModelChange)="refresh()"
+                        class="form-input">
                         <option [ngValue]="null">All Activity</option>
                         <option [ngValue]="1">1 Star Reviews</option>
                         <option [ngValue]="2">2 Star Reviews</option>
@@ -24,17 +25,36 @@
                         <option [ngValue]="4">4 Star Reviews</option>
                         <option [ngValue]="5">5 Star Reviews</option>
                     </select>
+
+                    <select id="sort-select" name="sort" [(ngModel)]="sortInput" (ngModelChange)="refresh()"
+                        class="form-input">
+                        <option value="newest">Newest Activity</option>
+                        <option value="az">Name: A-Z</option>
+                        <option value="za">Name: Z-A</option>
+                    </select>
                 </div>
             </form>
         </header>
 
         <div id="users-feed" class="list-wrapper">
+            <div class="custom-scrollbar-container">
+                <div class="scrollbar-thumb" 
+                     (mousedown)="startDrag($event)"
+                     [style.height.px]="thumbHeight"
+                     [style.transform]="'translateY(' + thumbTop + 'px)'">
+                </div>
+            </div>
+
             @if (totalResults() === 0) {
             <div class="empty-msg glass card">
                 <p>No users found matching your filters.</p>
             </div>
             } @else {
-            <cdk-virtual-scroll-viewport itemSize="320" class="admin-viewport" (scrolledIndexChange)="onScroll($event)"
+            <cdk-virtual-scroll-viewport 
+                itemSize="370" 
+                class="admin-viewport" 
+                [class.no-snap]="isDragging"
+                (scrolledIndexChange)="onScroll($event)"
                 (scroll)="onRawScroll()">
                 <div *cdkVirtualFor="let item of dataSource; trackBy: trackById" class="admin-item-wrapper">
                     @if (item) {

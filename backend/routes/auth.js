@@ -10,21 +10,21 @@ const crypto = require('crypto');
  * @desc    Check user status (exists/banned)
  * @access  Public
  */
-// Check if an email has an account and if it's banned
+//Check if an email has an account and if it's banned
 router.post('/check-status', async (req, res) => {
   try {
     const { email } = req.body;
-    
+
     if (!email) {
       return res.status(400).json({ error: 'Email is required' });
     }
 
     const user = await User.findOne({ email: email.toLowerCase() });
-    
+
     if (!user) {
       return res.json({ exists: false, isBanned: false });
     }
-    
+
     res.json({ exists: true, isBanned: user.isBanned });
   } catch (err) {
     res.status(500).json({ error: err.message });

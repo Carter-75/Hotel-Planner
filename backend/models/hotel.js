@@ -54,8 +54,8 @@ const hotelSchema = new mongoose.Schema({
   toObject: { virtuals: true }
 });
 
-// Virtual field for "Merged Rating"
-// Performs a weighted average merging total API reviews and total App reviews
+//Virtual field for "Merged Rating"
+//Performs a weighted average merging total API reviews and total App reviews
 hotelSchema.virtual('mergedRating').get(function() {
   const totalApiStars = (this.stars || 0) * (this.apiReviewCount || 0);
   const totalAppStars = (this.userRatingAverage || 0) * (this.userReviewCount || 0);

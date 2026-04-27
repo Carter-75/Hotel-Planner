@@ -5,25 +5,25 @@ import { HotelDataSource } from '../models/hotel.datasource';
   providedIn: 'root'
 })
 export class SearchStateService {
-  // Persistence for the Home Search
+  //Persistence for the Home Search
   hotels = signal<any[]>([]);
   totalResults = signal(0);
   currentPage = signal(1);
   hasMore = signal(false);
   
-  // Persistence for Filters
+  //Persistence for Filters
   location = signal('');
   minPrice = signal<number | null>(null);
   maxPrice = signal<number | null>(null);
   rating = signal<number | null>(null);
   
-  // Scroll Position Persistence
+  //Scroll Position Persistence
   scrollIndex = signal(0);
   scrollOffset = signal(0);
   
   dataSource?: HotelDataSource;
 
-  // Clear state when needed
+  //Clear state when needed
   reset() {
     this.hotels.set([]);
     this.totalResults.set(0);

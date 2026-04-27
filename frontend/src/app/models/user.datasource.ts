@@ -12,10 +12,10 @@ export class UserDataSource extends DataSource<any | undefined> {
   private _subscription = new Subscription();
   private _destroy$ = new Subject<void>();
   
-  // Public stream for total count
+  //Public stream for total count
   public totalResults$ = new BehaviorSubject<number>(0);
 
-  // Current filter state
+  //Current filter state
   private _filters: any = {};
 
   get totalLength(): number {
@@ -30,7 +30,7 @@ export class UserDataSource extends DataSource<any | undefined> {
    * Sets new filters and resets the cache
    */
   updateFilters(filters: any) {
-    // Clean filters: remove null, undefined, or empty strings
+    //Clean filters: remove null, undefined, or empty strings
     this._filters = Object.keys(filters).reduce((acc: any, key) => {
       const val = filters[key];
       if (val !== null && val !== undefined && val !== '') {
@@ -44,7 +44,7 @@ export class UserDataSource extends DataSource<any | undefined> {
     this._length = 0;
     this._dataStream.next([]);
 
-    // Bootstrap: Fetch first page to get total size
+    //Bootstrap: Fetch first page to get total size
     this._fetchPage(0);
   }
 
@@ -67,7 +67,7 @@ export class UserDataSource extends DataSource<any | undefined> {
           this._fetchPage(i);
         }
 
-        // Proactively unload pages that are far away (buffer of 3 pages)
+        //Proactively unload pages that are far away (buffer of 3 pages)
         this._cleanupCache(startPage, endPage);
       })
     );
@@ -75,8 +75,7 @@ export class UserDataSource extends DataSource<any | undefined> {
   }
 
   disconnect(): void {
-    // We only unsubscribe the internal connection listeners, 
-    // but WE DO NOT complete the subjects because this DataSource is a singleton
+    //unsubscribe
     this._subscription.unsubscribe();
     this._subscription = new Subscription();
   }
@@ -90,6 +89,7 @@ export class UserDataSource extends DataSource<any | undefined> {
 
     const params = {
       ...this._filters,
+      sort: this._filters.sort || 'newest',
       page: pageIndex + 1,
       limit: this._pageSize
     };
@@ -100,10 +100,10 @@ export class UserDataSource extends DataSource<any | undefined> {
       this._length = res.total;
       this.totalResults$.next(res.total);
       
-      // Update our sparse representation
+      //Update our sparse representation
       this._cachedData.set(pageIndex, res.items);
 
-      // Construct a full array for the stream
+      //Construct a full array for the stream
       this._updateDataStream();
     });
   }

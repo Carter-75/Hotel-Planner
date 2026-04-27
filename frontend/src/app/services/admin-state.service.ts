@@ -5,23 +5,24 @@ import { UserDataSource } from '../models/user.datasource';
   providedIn: 'root'
 })
 export class AdminStateService {
-  // Feed Data
+  //Feed Data
   items = signal<any[]>([]);
   totalResults = signal(0);
   currentPage = signal(1);
   hasMore = signal(false);
   
-  // Filters
+  //Filters
   usernameFilter = signal('');
   ratingFilter = signal<number | null>(null);
+  sortOrder = signal<'newest' | 'az' | 'za'>('newest');
   
-  // Scroll Position
+  //Scroll Position
   scrollIndex = signal(0);
   scrollOffset = signal(0);
 
   dataSource?: UserDataSource;
 
-  // Clear state (e.g. for forced logout or reset)
+  //Clear state (e.g. for forced logout or reset)
   reset() {
     this.items.set([]);
     this.totalResults.set(0);
@@ -29,6 +30,7 @@ export class AdminStateService {
     this.hasMore.set(false);
     this.usernameFilter.set('');
     this.ratingFilter.set(null);
+    this.sortOrder.set('newest');
     this.scrollIndex.set(0);
     this.scrollOffset.set(0);
     this.dataSource = undefined;

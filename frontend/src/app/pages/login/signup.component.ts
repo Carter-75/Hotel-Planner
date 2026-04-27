@@ -14,12 +14,17 @@ export class SignupComponent implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
 
-  // Banana in a box model using signals
+  //Banana in a box model using signals
   firstName = signal('');
   lastName = signal('');
 
+  startOver() {
+    this.authService.pendingCredentials.set(null);
+    this.router.navigate(['/login']);
+  }
+
   ngOnInit() {
-    // If no pending credentials, user shouldn't be here
+    //If no pending credentials, user shouldn't be here
     if (!this.authService.pendingCredentials()) {
       this.router.navigate(['/login']);
     }
@@ -39,7 +44,7 @@ export class SignupComponent implements OnInit {
       password: creds.password
     }).subscribe({
       next: () => {
-        // Clear pending credentials after success
+        //Clear pending credentials after success
         this.authService.pendingCredentials.set(null);
       },
       error: (err: any) => console.error('Registration failed:', err)

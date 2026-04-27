@@ -69,6 +69,10 @@
     color: var(--text-muted);
 }
 
+.form-input {
+    color: #ffffff !important;
+}
+
 textarea.form-input {
     resize: none;
 }

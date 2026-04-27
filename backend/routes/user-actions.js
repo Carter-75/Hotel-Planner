@@ -4,11 +4,11 @@ const User = require('../models/user');
 const { isAuthenticated } = require('../middleware/auth');
 
 /**
- * @route   POST /api/user/save-hotel/:id
+ * @route   POST /api/user/saved-hotels/:id
  * @desc    Toggle saving a hotel to the user's list
  * @access  Private
  */
-router.post('/save-hotel/:id', isAuthenticated, async (req, res) => {
+router.post('/saved-hotels/:id', isAuthenticated, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ error: 'User not found' });
@@ -17,10 +17,10 @@ router.post('/save-hotel/:id', isAuthenticated, async (req, res) => {
     const index = user.savedHotels.indexOf(hotelId);
 
     if (index > -1) {
-      // Remove if already saved
+      //Remove if already saved
       user.savedHotels.splice(index, 1);
     } else {
-      // Save if not present
+      //Save if not present
       user.savedHotels.push(hotelId);
     }
 

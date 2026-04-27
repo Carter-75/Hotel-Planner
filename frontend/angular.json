@@ -22,7 +22,17 @@
             ],
             "styles": [
               "src/styles.css"
-            ]
+            ],
+            "optimization": {
+              "scripts": true,
+              "styles": {
+                "minify": true,
+                "inlineCritical": true
+              },
+              "fonts": {
+                "inline": false
+              }
+            }
           },
           "configurations": {
             "production": {
@@ -34,8 +44,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
+                  "maximumWarning": "6kB",
+                  "maximumError": "10kB"
                 }
               ],
               "outputHashing": "all"
@@ -52,7 +62,8 @@
           "builder": "@angular/build:dev-server",
           "options": {
             "buildTarget": "frontend:build",
-            "port": 4200
+            "port": 4200,
+            "proxyConfig": "proxy.conf.json"
           },
           "configurations": {
             "production": {

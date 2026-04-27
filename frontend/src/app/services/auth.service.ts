@@ -5,7 +5,7 @@ import { ApiService } from './api.service';
 import { catchError, map, tap } from 'rxjs/operators';
 import { of, Observable, forkJoin } from 'rxjs';
 
-// This is what a user object looks like in our app
+//This is what a user object looks like in our app
 export interface User {
   _id: string;
   googleId?: string;
@@ -192,13 +192,6 @@ export class AuthService {
     );
   }
 
-  /**
-   * Request a password reset email
-   */
-  // Request a password reset link to be sent to an email
-  forgotPassword(email: string): Observable<any> {
-    return this.api.postData<any>('auth/forgot-password', { email });
-  }
 
   /**
    * Check user status (exists/banned) by email
@@ -208,13 +201,6 @@ export class AuthService {
     return this.api.postData<{ exists: boolean, isBanned: boolean }>('auth/check-status', { email });
   }
 
-  /**
-   * Reset password using a token
-   */
-  // Set a new password using a secret token from an email
-  resetPassword(token: string, password: string): Observable<any> {
-    return this.api.postData<any>('auth/reset-password', { token, password });
-  }
 
   /**
    * Logout the user

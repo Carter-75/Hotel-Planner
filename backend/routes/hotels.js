@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Hotel = require('../models/hotel');
+const Review = require('../models/review');
 const { isAdmin } = require('../middleware/auth');
 
 /**
@@ -16,24 +17,23 @@ router.get('/', async (req, res) => {
     let sort = { createdAt: -1 };
     let projection = {};
 
-    // Filter by city or address
+    //Filter by city or address
     if (location) {
-      // Split by commas and wrap each part in quotes to force an 'AND' phrase search.
+      //Split by commas and wrap each part in quotes to force an 'AND' phrase search.
       // E.g. "La Crosse, WI" -> "\"La Crosse\" \"WI\""
-      // This prevents "La" matching "LA" (Louisiana) unless "Crosse" is also present.
+      //This prevents "La" matching "LA" (Louisiana) unless "Crosse" is also present.
       const phraseQuery = location.split(',')
         .map(p => `"${p.trim()}"`)
         .join(' ');
 
       query.$text = { $search: phraseQuery };
       
-      // During a text search, we MUST sort by relevance score
-      // otherwise generic 'USA' matches will clutter the results.
+      //During a text search, we MUST sort by relevance score otherwise generic 'USA' matches will clutter the results.
       projection = { score: { $meta: "textScore" } };
       sort = { score: { $meta: "textScore" } };
     }
 
-    // Filter by price range
+    //Filter by price range
     if (minPrice || maxPrice) {
       query.price = {};
       const min = Number(minPrice);
@@ -128,6 +128,22 @@ router.delete('/:id', isAdmin, async (req, res) => {
     const hotel = await Hotel.findByIdAndDelete(req.params.id);
     if (!hotel) return res.status(404).json({ error: 'Hotel not found' });
     res.json({ message: 'Hotel deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * @route   GET /api/hotels/:id/reviews
+ * @desc    Get all reviews for a specific hotel
+ * @access  Public
+ */
+router.get('/:id/reviews', async (req, res) => {
+  try {
+    const reviews = await Review.find({ hotelId: req.params.id })
+      .populate('userId', 'firstName lastName image')
+      .sort({ createdAt: -1 });
+    res.json(reviews);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
