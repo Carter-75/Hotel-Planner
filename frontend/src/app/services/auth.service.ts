@@ -203,6 +203,23 @@ export class AuthService {
 
 
   /**
+   * Request a password reset email
+   */
+  // Request a password reset link to be sent to an email
+  forgotPassword(email: string): Observable<any> {
+    return this.api.postData('auth/forgot-password', { email });
+  }
+
+  /**
+   * Reset password using a token
+   */
+  // Set a new password using a secret token from an email
+  resetPassword(token: string, password: string): Observable<any> {
+    return this.api.postData('auth/reset-password', { token, password });
+  }
+
+
+  /**
    * Logout the user
    */
   // Log out and clear everything
