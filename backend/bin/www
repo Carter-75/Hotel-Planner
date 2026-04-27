@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-require('dotenv').config({ path: require('path').join(__dirname, '../../.env.local') });
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../../.env.local') });
 const app = require('../app');
 const http = require('http');
 
@@ -7,6 +8,6 @@ const port = process.env.PORT || '3000';
 app.set('port', port);
 
 const server = http.createServer(app);
-server.listen(port, () => {
-  console.log(`Backend listening on port ${port} (Project: ${process.env.PROJECT_NAME})`);
+server.listen(port, '0.0.0.0', () => {
+  console.log(`Backend listening on port ${port} (Project: ${process.env.PROJECT_NAME || 'Hotel-Planner'})`);
 });

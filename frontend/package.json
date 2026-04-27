@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "node scripts/build-tasks.js prebuild && ng build && node scripts/build-tasks.js postbuild",
+    "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "vitest"
   },

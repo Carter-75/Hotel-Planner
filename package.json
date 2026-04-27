@@ -5,10 +5,12 @@
   "main": "index.js",
   "scripts": {
     "build": "cd frontend && npm install && npm run build",
-    "dev": "node start-dev.js",
-    "start": "node start-dev.js",
+    "dev": "npx concurrently \"npm run dev --prefix backend\" \"npm run start --prefix frontend\"",
+    "start": "npx concurrently \"npm run start --prefix backend\" \"npm run start --prefix frontend\"",
+    "dev:launcher": "node start-dev.js",
+    "start:launcher": "node start-dev.js",
     "install:all": "npm install && npm install --prefix backend && npm install --prefix frontend",
-    "install-all": "npm run install:all",
+    "install-all": "npm install --prefix backend && npm install --prefix frontend",
     "backend": "npm run dev --prefix backend",
     "frontend": "npm run start --prefix frontend"
   },
