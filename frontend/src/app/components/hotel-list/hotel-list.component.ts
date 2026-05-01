@@ -61,6 +61,7 @@ import { HotelCardComponent } from '../hotel-card/hotel-card.component';
     .hotel-item {
       padding: 10px 0;
       height: 200px;
+      width: 100%;
       box-sizing: border-box;
     }
     .empty-msg {

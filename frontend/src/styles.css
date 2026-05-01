@@ -48,7 +48,6 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.02em;
 }
 
-/* Ensure custom components can fill their parent's height */
 app-home,
 app-saved-hotels,
 app-hotel-details,
@@ -56,11 +55,12 @@ app-admin-users,
 app-reviews,
 app-add-review,
 app-banned,
-app-search-results, 
+app-search-results,
 app-hotel-list {
   display: flex !important;
   flex-direction: column !important;
   flex: 1 !important;
+  width: 100% !important;
   height: 100% !important;
   min-height: 0 !important;
 }
