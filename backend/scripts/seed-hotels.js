@@ -12,7 +12,7 @@ const dns = require('node:dns');
 dns.setServers(['8.8.8.8', '1.1.1.1']);
 
 // Load environment variables
-require('dotenv').config({ path: path.join(__dirname, '../.env') });
+require('dotenv').config({ path: path.join(__dirname, '../../.env.local') });
 
 const Hotel = require('../models/hotel');
 

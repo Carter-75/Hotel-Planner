@@ -4,7 +4,7 @@ const dotenv = require('dotenv');
 const bcrypt = require('bcryptjs');
 
 // Load env
-const envPath = path.join(__dirname, '../.env');
+const envPath = path.join(__dirname, '../../.env.local');
 dotenv.config({ path: envPath });
 
 const User = require('../models/user');
