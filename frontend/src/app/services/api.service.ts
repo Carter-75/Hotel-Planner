@@ -8,23 +8,10 @@ import { Observable } from 'rxjs';
 export class ApiService {
   private http = inject(HttpClient);
   
-  //Picks the right API URL based on where we are (local vs prod)
+  // The frontend and the API are deployed together as one app, and the
+  // local dev server proxies /api to the backend (see proxy.conf.json), so
+  // the API is always same-origin under /api.
   private get apiUrl(): string {
-    const isProd = ('__PRODUCTION__' as string) === 'true';
-    const prodBackend = '__PROD_BACKEND_URL__' as string;
-    const prodFrontend = '__PROD_FRONTEND_URL__' as string;
-    
-    const host = window.location.hostname;
-    const isLocal = host === 'localhost' || host === '127.0.0.1';
-    
-    if (isLocal && !isProd) {
-      return '/api';
-    }
-
-    if (prodBackend && prodBackend !== '' && !prodBackend.includes('__PROD_')) {
-      return prodBackend.endsWith('/') ? prodBackend.slice(0, -1) + '/api' : prodBackend + '/api';
-    }
-
     return '/api';
   }
 

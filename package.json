@@ -2,7 +2,6 @@
   "name": "hotel-planner-root",
   "version": "1.0.0",
   "description": "Unified launcher for Hotel-Planner",
-  "main": "index.js",
   "scripts": {
     "build": "cd frontend && npm install && npm run build",
     "dev": "npx concurrently \"npm run dev --prefix backend\" \"npm run start --prefix frontend\"",
@@ -33,15 +32,12 @@
     "helmet": "^7.1.0",
     "mongoose": "^8.0.0",
     "morgan": "~1.10.0",
+    "nodemailer": "^6.9.14",
     "nodemon": "^3.1.0",
-    "openai": "^4.55.0",
     "passport": "^0.7.0",
-    "passport-google-oauth20": "^2.0.0",
     "passport-local": "^1.0.0",
     "portfinder": "^1.0.38",
     "rxjs": "~7.8.0",
-    "tslib": "^2.3.0",
-    "ws": "^8.18.0",
-    "zod": "^3.23.8"
+    "tslib": "^2.3.0"
   }
 }

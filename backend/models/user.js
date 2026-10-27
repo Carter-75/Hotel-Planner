@@ -45,6 +45,18 @@ const userSchema = new mongoose.Schema({
   }
 });
 
+// Never expose credential material in API responses.
+// res.json() uses toJSON, so stripping the fields here covers every route
+// that returns a user document (register, login, /auth/user, admin actions).
+userSchema.set('toJSON', {
+  transform: (doc, ret) => {
+    delete ret.password;
+    delete ret.resetPasswordToken;
+    delete ret.resetPasswordExpires;
+    return ret;
+  }
+});
+
 // Securely hash the password before saving it to the database
 userSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();

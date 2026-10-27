@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const router = express.Router();
 const Hotel = require('../models/hotel');
 const Review = require('../models/review');
@@ -77,6 +78,9 @@ router.get('/', async (req, res) => {
 // Get all the details for just one hotel
 router.get('/:id', async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(404).json({ error: 'Hotel not found' });
+    }
     const hotel = await Hotel.findById(req.params.id);
     if (!hotel) return res.status(404).json({ error: 'Hotel not found' });
     res.json(hotel);
@@ -140,6 +144,9 @@ router.delete('/:id', isAdmin, async (req, res) => {
  */
 router.get('/:id/reviews', async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(404).json({ error: 'Hotel not found' });
+    }
     const reviews = await Review.find({ hotelId: req.params.id })
       .populate('userId', 'firstName lastName image')
       .sort({ createdAt: -1 });

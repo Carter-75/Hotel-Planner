@@ -4,6 +4,15 @@ const mongoose = require('mongoose');
 const router = express.Router();
 const User = require('../models/user');
 const crypto = require('crypto');
+const { sendPasswordReset } = require('../utils/mailer');
+
+// Base URL of the deployed frontend, used to build password reset links.
+const frontendBaseUrl = (req) => {
+  const configured = process.env.FRONTEND_URL || process.env.PROD_FRONTEND_URL;
+  if (configured) return configured.replace(/\/$/, '');
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  return 'http://localhost:4200';
+};
 
 /**
  * @route   POST /api/auth/check-status
@@ -40,6 +49,10 @@ router.post('/check-status', async (req, res) => {
 router.post('/register', async (req, res) => {
   try {
     const { email, password, firstName, lastName } = req.body;
+
+    if (!email || !password || !firstName || !lastName) {
+      return res.status(400).json({ message: 'Email, password, first name, and last name are all required' });
+    }
 
     // Check if user exists
     let user = await User.findOne({ email: email.toLowerCase() });
@@ -119,6 +132,11 @@ router.get('/user', (req, res) => {
 router.post('/forgot-password', async (req, res) => {
   try {
     const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
+    }
+
     const user = await User.findOne({ email: email.toLowerCase() });
 
     if (!user) {
@@ -131,7 +149,16 @@ router.post('/forgot-password', async (req, res) => {
 
     await user.save();
 
-    console.log(`[AUTH SERVICE] Reset Link: http://localhost:4200/reset-password?token=${token}`);
+    const resetUrl = `${frontendBaseUrl(req)}/reset-password?token=${token}`;
+    const result = await sendPasswordReset(user.email, resetUrl);
+    if (result.sent) {
+      console.log(`[AUTH SERVICE] Password reset email sent to ${user.email}`);
+    } else {
+      // SMTP is not configured on this deployment, so no email was sent.
+      // Log the link so the flow still works in local development, and make
+      // the gap visible in server logs instead of hiding it.
+      console.warn(`[AUTH SERVICE] ${result.reason}. Reset link (no email sent): ${resetUrl}`);
+    }
 
     res.json({ message: 'If an account with that email exists, an email has been sent.' });
   } catch (err) {
@@ -148,6 +175,11 @@ router.post('/forgot-password', async (req, res) => {
 router.post('/reset-password', async (req, res) => {
   try {
     const { token, password } = req.body;
+
+    if (!token || !password) {
+      return res.status(400).json({ message: 'Token and new password are both required' });
+    }
+
     const user = await User.findOne({
       resetPasswordToken: token,
       resetPasswordExpires: { $gt: Date.now() }

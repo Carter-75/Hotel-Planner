@@ -34,9 +34,13 @@ async function start() {
     fs.writeFileSync(proxyPath, JSON.stringify(proxyConfig, null, 2));
     console.log('Generated frontend/proxy.conf.json');
 
+    // npm is npm.cmd on Windows and npm everywhere else; spawning 'cmd /c'
+    // here made the launcher Windows-only.
+    const npmCmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+
     // 4. Start Backend
     console.log('Starting Backend...');
-    const backend = spawn('cmd', ['/c', 'npm', 'run', 'dev'], {
+    const backend = spawn(npmCmd, ['run', 'dev'], {
       cwd: path.join(__dirname, 'backend'),
       env: { ...process.env, PORT: backendPort },
       stdio: 'inherit'
@@ -44,7 +48,7 @@ async function start() {
 
     // 5. Start Frontend
     console.log('Starting Frontend...');
-    const frontend = spawn('cmd', ['/c', 'npm', 'run', 'start', '--', `--port=${frontendPort}`, '--proxy-config=proxy.conf.json'], {
+    const frontend = spawn(npmCmd, ['run', 'start', '--', `--port=${frontendPort}`, '--proxy-config=proxy.conf.json'], {
       cwd: path.join(__dirname, 'frontend'),
       stdio: 'inherit'
     });

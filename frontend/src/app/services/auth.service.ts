@@ -8,7 +8,6 @@ import { of, Observable, forkJoin } from 'rxjs';
 //This is what a user object looks like in our app
 export interface User {
   _id: string;
-  googleId?: string;
   email: string;
   displayName?: string;
   firstName?: string;

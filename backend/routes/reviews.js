@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const router = express.Router();
 const Review = require('../models/review');
 const User = require('../models/user');
@@ -41,6 +42,9 @@ router.post('/', isAuthenticated, async (req, res) => {
  */
 router.get('/:id', async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(404).json({ error: 'Review not found' });
+    }
     const review = await Review.findById(req.params.id);
     if (!review) return res.status(404).json({ error: 'Review not found' });
     res.json(review);
@@ -58,6 +62,9 @@ router.get('/:id', async (req, res) => {
 router.put('/:id', isAuthenticated, async (req, res) => {
   try {
     const { rating, comment } = req.body;
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(404).json({ error: 'Review not found' });
+    }
     const review = await Review.findById(req.params.id);
     
     if (!review) return res.status(404).json({ error: 'Review not found' });
@@ -86,6 +93,9 @@ router.put('/:id', isAuthenticated, async (req, res) => {
 // Remove a review - must be the person who wrote it OR an admin
 router.delete('/:id', isAuthenticated, async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(404).json({ error: 'Review not found' });
+    }
     const review = await Review.findById(req.params.id);
     if (!review) return res.status(404).json({ error: 'Review not found' });
 

@@ -43,6 +43,7 @@ if (isProd) {
 // Frame Ancestors for Iframe Security
 const frameAncestors = [
   "'self'",
+  "https://www.carter-portfolio.fyi",
   "https://carter-portfolio.fyi",
   "https://carter-portfolio.vercel.app",
   "https://*.vercel.app",
@@ -65,31 +66,32 @@ const adminRouter = require('./routes/admin');
 // --- Diagnostic Routes ---
 app.get('/api/health', async (req, res) => {
   const isConnected = mongoose.connection.readyState === 1;
-  try {
-    const hotelCount = await mongoose.model('Hotel').countDocuments();
-    res.json({
-      status: 'OK',
-      database: isConnected ? 'Connected' : 'Disconnected',
-      hotelCount: hotelCount,
-      timestamp: new Date().toISOString()
-    });
-  } catch (err) {
-    res.json({
-      status: 'OK',
-      database: isConnected ? 'Connected' : 'Disconnected',
-      hotelCount: 0,
-      timestamp: new Date().toISOString()
-    });
+  let hotelCount = 0;
+  if (isConnected) {
+    try {
+      hotelCount = await mongoose.model('Hotel').countDocuments();
+    } catch (err) {
+      hotelCount = 0;
+    }
   }
+  // Report honestly: a disconnected database is not OK.
+  res.status(isConnected ? 200 : 503).json({
+    status: isConnected ? 'OK' : 'DEGRADED',
+    database: isConnected ? 'Connected' : 'Disconnected',
+    hotelCount: hotelCount,
+    timestamp: new Date().toISOString()
+  });
 });
 
 // --- MongoDB Setup ---
 const mongoURI = process.env.MONGODB_URI;
 
 //Global caching for Mongoose to prevent connection exhaustion in serverless or multi-instance environments
-let cached = global.mongoose;
+//NOTE: stored under its own global key. Storing this cache on global.mongoose
+//would shadow the mongoose module for any code that reads the global.
+let cached = global.__hotelPlannerMongooseCache;
 if (!cached) {
-  cached = global.mongoose = { conn: null, promise: null };
+  cached = global.__hotelPlannerMongooseCache = { conn: null, promise: null };
 }
 
 const connectDB = async () => {
@@ -109,8 +111,16 @@ const connectDB = async () => {
     };
 
     console.log('INFO: Connecting to MongoDB (New Connection)...');
-    cached.promise = mongoose.connect(mongoURI, opts).then((m) => {
+    cached.promise = mongoose.connect(mongoURI, opts).then(async (m) => {
       console.log('OK: Connected to MongoDB');
+      // Hotel location search uses a $text query, which fails with a 500
+      // unless the text index exists. Mongoose does not auto-create indexes
+      // in production, so make sure they exist after every fresh connect.
+      try {
+        await require('./models/hotel').ensureIndexes();
+      } catch (indexErr) {
+        console.error('WARN: Could not ensure Hotel indexes:', indexErr.message);
+      }
       return m;
     });
   }
@@ -164,11 +174,6 @@ app.use(helmet({
     },
   },
 }));
-
-app.use((req, res, next) => {
-  res.setHeader('X-Frame-Options', 'ALLOWALL');
-  next();
-});
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -226,6 +231,9 @@ app.use('/api/admin', adminRouter);
 
 //serve index.html for any non-API routes
 app.get('*', (req, res) => {
+  if (req.path.startsWith('/api')) {
+    return res.status(404).json({ error: 'API route not found' });
+  }
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
